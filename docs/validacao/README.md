@@ -2,7 +2,8 @@
 
 | Verificação | Resultado | O que comprova |
 |---|---|---|
-| Parser oficial do Build Arch | Quatro backups aceitos; nove revisões do principal | Compatibilidade estrutural dos arquivos |
+| PPT/PDF originais | 25 slides/páginas comparados; cobertura registrada | Correspondência temática e exemplos do material fornecido |
+| Parser oficial do Build Arch | Quatro backups aceitos; 19 revisões do principal | Compatibilidade estrutural dos arquivos |
 | Validador do schema | Oito tabelas; sem achados críticos/avisos | Estrutura de tabelas, FKs e índices |
 | Motor temporal | Labs 01/02/03 com mesmos parâmetros | Comparação do modelo, sem benchmark real |
 | Motor ao vivo | Pico 10x e pendências conferidos | Cálculo virtual de processamento/drenagem |
@@ -15,3 +16,5 @@
 O Compose não foi executado com containers nesta preparação. Não foram realizados benchmark HTTP, failover de PostgreSQL, recuperação de região ou validação do workflow de pagamento. Segredos, segurança de produção e disponibilidade precisam de implementação e teste.
 
 Capacidade, custo e disponibilidade cadastrados no Build Arch são premissas. Relações de inicialização, controle e telemetria não são todas saltos de uma requisição. A simulação temporal e a carga ao vivo têm cálculos diferentes.
+
+[Registro de alinhamento às fontes](alinhamento-palestra.json) e [matriz de correspondência](../arquitetura/04-correspondencia-palestra.md).

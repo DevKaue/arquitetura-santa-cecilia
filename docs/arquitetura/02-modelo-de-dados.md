@@ -1,5 +1,7 @@
 # Modelo de dados — Arquitetura Santa Cecília
 
+**Aprofundamento do exemplo:** estes detalhes de implementação complementam a palestra; não fazem parte da figura original do slide 19. A referência por slide está na [matriz de correspondência](04-correspondencia-palestra.md).
+
 O banco principal contém oito tabelas. `orders` liga dono sintético, chave de idempotência e hash da solicitação; `reservations` explicita expiração e compensação; `outbox` e `processed_events` demonstram entrega e deduplicação.
 
 ```mermaid

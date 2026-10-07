@@ -1,55 +1,35 @@
 # Visão e decisões arquiteturais
 
-## Três jornadas
+## Referência do material original
 
-```mermaid
-flowchart LR
-    U[Usuários] --> E[CDN e WAF]
-    E --> LB[Entrada e balanceamento]
-    LB --> C[Catálogo]
-    C --> R[Cache]
-    C --> RR[Réplicas de leitura]
-    LB --> X[Checkout]
-    X --> P[Writer e standby]
-    X --> PSP[Pagamento externo]
-    P --> O[Outbox relay]
-    O --> Q[Fila pós-compra]
-    Q --> W[Notificações]
-    Q --> D[DLQ]
-```
+Principal **v19**: 23 blocos, 40 relações, alinhados aos slides 3–25. [Correspondência completa](04-correspondencia-palestra.md). A duração da fala não determina o conteúdo do mapa.
 
-DNS, identidade, observabilidade, CI/CD e DR aparecem no backup completo como relações de controle/operação. O diagrama acima resume jornadas de dados e não representa todas as chamadas ou o roteamento do simulador.
+| Camada | Blocos principais | Pergunta resolvida |
+|---|---|---|
+| Borda | Usuários, DNS, WAF, CDN | De onde vem o cliente e como atender perto/proteger? |
+| Entrada | Gateway/LB, identidade, sala de espera | Como distribuir, autenticar e controlar o pico? |
+| Orquestração | Catálogo, checkout, notificações, containers, autoscaler | Como escalar cópias e manter o essencial? |
+| Dados | Cache, writer, réplicas A/B, fila | O que pode atrasar e o que precisa da fonte da verdade? |
+| Multi-região | Região secundária, DNS, réplica próxima | Como reduzir distância e planejar continuidade? |
+| Observabilidade | Métricas, logs, tracing | Qual peça satura e onde o erro começou? |
+| Entrega | CI/CD, análise estática, monitoramento | Como lançar para parte do tráfego e voltar? |
 
-## ADR 01 · Leitura eventual e compra autoritativa
+## Leitura, compra e trabalho posterior
 
-**Contexto:** predominância de consulta com menos escritas, porém maior impacto em uma compra inválida.  
-**Decisão:** CDN/cache-aside/réplicas para catálogo; writer e reserva condicional para compra.  
-**Consequência:** monitorar cache HIT e replication lag; definir TTL/invalidação; testar concorrência. Reserva pela réplica/cache foi descartada por atraso possível.
+Catálogo usa cache; MISS escolhe uma réplica saudável. Compra valida identidade/permissão e estoque no writer. Trabalho posterior segue à fila e workers, sem adiar a reserva necessária à venda. As réplicas são destinos alternativos; o mapa não impõe consulta aos dois bancos em cada MISS.
 
-## ADR 02 · Outbox e entrega com repetição
+Sala de espera limita acesso em pico; a fila assíncrona guarda tarefas. Circuit breaker, timeout e retry são comportamentos de dependências. Modo degradado desliga recomendações/avaliações para preservar catálogo e checkout.
 
-**Contexto:** banco e broker não compartilham uma transação SQL local.  
-**Decisão:** pedido/intenção de evento são gravados juntos; relay publica após commit com confirmação; consumidor controla duplicatas; DLQ encerra tentativas.  
-**Consequência:** estado operacional adicional, idade da outbox/fila e processo de reprocessamento. `purchase_confirmed` exige pagamento reconciliado.
+## Segurança por peça
 
-## ADR 03 · Writer único e recuperação
+HTTPS até a borda, entrada e backend; terminação e nova sessão TLS na entrada. Autenticação e autorização antes do domínio. Cache sem pagamento/documentos e TTL curto para informação pessoal. Banco com criptografia em repouso e menor privilégio. Mensagens mínimas, logs mascarados, residência de dados considerada na região.
 
-**Contexto:** evitar conflitos de escrita fora do escopo da aula.  
-**Decisão:** writer + standby; região secundária para DR. RPO ≤ 5 min/RTO ≤ 30 min propostos.  
-**Consequência:** restore e failover ensaiados, fencing e possível indisponibilidade durante recuperação. Active-active exigiria estratégia de conflito adicional.
+## Operação e custo
 
-## ADR 04 · Mapa lógico separado dos Labs
+CPU/fila orientam autoscaling; teto e alarme exigem decisão humana quando necessário. Métricas, logs e tracing ajudam a investir no limitador. Canary/rollback usam sinais do monitoramento. Compute, storage, egress e CDN entram na comparação de provedores, junto ao trabalho da equipe. Números do painel são didáticos.
 
-**Contexto:** o modelo completo inclui planos de controle/telemetria e alternativas de tráfego.  
-**Decisão:** usar Labs lineares para comparar capacidade e manter os mesmos parâmetros.  
-**Consequência:** três projetos de apoio; declarar o limite dos motores e evitar interpretar ramificações como perfil 95/5.
+## Aprofundamento preservado
 
-## Controles e métricas
+Outbox, DLQ, reserva concorrente e reconciliação são detalhes adicionais de implementação, disponíveis na v9 e nas [notas de checkout/eventos](03-checkout-e-eventos.md). A v10 preserva a visão compacta anterior. v11 guarda o estado do Desktop antes da reorganização. v12–v19 seguem os slides 5 e 13–19.
 
-Bancos/cache/broker privados; autorização por pedido; segredos fora do código/log; menor privilégio; timeout/retry finitos. Métricas: p95/p99 medidos, erro, saturação, cache HIT, atraso de réplica, idade da fila/outbox/DLQ e pagamentos pendentes. Canary usa métricas; migrações compatíveis e rollback exigem revisão do estado dos dados.
-
-Referências: [PostgreSQL — isolamento](https://www.postgresql.org/docs/current/transaction-iso.html), [PostgreSQL — standby](https://www.postgresql.org/docs/current/warm-standby.html), [RabbitMQ — confirmações e ACK](https://www.rabbitmq.com/docs/confirms).
-
-## Visão para a palestra de 40 minutos
-
-A v10 oferece um mapa de apresentação com leitura, compra e pós-compra (13 blocos/13 relações). As réplicas A/B foram agrupadas. O detalhamento completo permanece na v9 (19 blocos/25 relações); DNS, identidade, operação e DR continuam válidos. O roteiro reserva 10 minutos para demonstrar, com plano de 5 minutos. Todos os arquivos e Labs foram mantidos.
+Um writer e standby não criam múltiplos escritores. O slide 18 não fixa RPO/RTO; definir metas e testar promoção, restauração e roteamento faz parte da implementação. O Compose é um inventário demonstrativo de nove serviços e não implanta toda a referência global.

@@ -13,29 +13,32 @@ Repositório: https://github.com/DevKaue/arquitetura-santa-cecilia
 Referência:  main
 ```
 
-Executar a análise, revisar evidências e abrir o rascunho gerado. O Compose descreve nove serviços, redes e volume. A inferência verificada identificou 23 blocos e 22 relações; esse mapa inclui imagens e abstrações de software. O desenho revisado em [buildarch/](buildarch/) tem uma visão compacta v10 com 13 blocos/13 relações; o mapa completo de 19 blocos/25 relações está preservado na v9.
+Executar a análise, revisar evidências e abrir o rascunho gerado. O Compose descreve nove serviços, redes e volume. A inferência verificada identificou 23 blocos e 22 relações; esse mapa inclui imagens e abstrações de software. O desenho revisado em [buildarch/](buildarch/) acompanha as camadas e a evolução do PPT/PDF: v19 com 23 blocos/40 relações, 19 revisões e duas réplicas separadas. v12–v19 correspondem aos slides 5 e 13–19; versões anteriores permanecem preservadas.
 
 ## Navegação
 
 | Material | Uso |
 |---|---|
 | [Resumo executivo](docs/apresentacao/01-resumo-executivo.md) | Revisar decisões e alinhar os slides |
-| [Roteiro de 10 minutos](docs/apresentacao/02-roteiro-demonstracao.md) | Conduzir a demonstração e importar do GitHub |
+| [Roteiro conforme a palestra](docs/apresentacao/02-roteiro-demonstracao.md) | Conduzir a demonstração e importar do GitHub |
 | [Cartão do apresentador](docs/apresentacao/03-cartao-apresentador.md) | Consultar parâmetros e sequência durante o ensaio |
 | [Perguntas e respostas](docs/apresentacao/04-perguntas-respostas.md) | Apoiar a discussão com a plateia |
 | [Guia da palestra em PDF](docs/apresentacao/guia-da-palestra.pdf) | Enviar para revisão e consultar o material diagramado |
 | [Visão e decisões](docs/arquitetura/01-visao-e-decisoes.md) | Jornadas, trade-offs e operação |
 | [Modelo de dados](docs/arquitetura/02-modelo-de-dados.md) | Pedidos, reservas, outbox e deduplicação |
 | [Checkout e eventos](docs/arquitetura/03-checkout-e-eventos.md) | Sequência transacional e integração externa |
+| [Correspondência dos 25 slides](docs/arquitetura/04-correspondencia-palestra.md) | Conferir a fidelidade às fontes e distinguir complementos |
+| [Roteiro curto opcional](docs/apresentacao/05-roteiro-curto-opcional.md) | Escolher condução de 10/5 min sem limitar o mapa |
 | [Validação](docs/validacao/README.md) | Evidências, parâmetros e limites |
 
 ## O que o exemplo ensina
 
 - Leitura eventual em CDN/cache/réplicas e compra autoritativa no writer.
 - Reserva concorrente, autorização por pedido e idempotência.
-- Outbox relay, confirmação do broker, consumidor idempotente e DLQ.
+- Fila/worker, observabilidade e multi-região conforme os slides; outbox/DLQ no aprofundamento preservado.
 - Diagnóstico de gargalo: aumentar APIs pode manter o banco limitante.
-- Observabilidade, entrega gradual e recuperação com RPO/RTO propostos.
+- Orquestração, autoscaling com teto, sala de espera, modo degradado e entrega gradual.
+- Compute, storage, egress e CDN; sem preços fixos nem provedor obrigatório.
 
 ## Estrutura
 

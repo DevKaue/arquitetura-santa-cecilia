@@ -1,7 +1,7 @@
 # Arquitetura Santa Cecília
 ## Perguntas e respostas para discussão
 
-Reservar cerca de **4 minutos** da palestra de 40 minutos para perguntas. Usar a **resposta breve**; manter o aprofundamento como apoio para conversa posterior. Priorizar as perguntas 2 (gargalo), 5 (estoque) e 14 (inferência), conforme a plateia. A demonstração principal tem 10 minutos e não precisa cobrir este caderno inteiro.
+Usar as respostas breves durante as perguntas e o aprofundamento conforme o interesse da plateia. A numeração segue os temas discutidos na palestra; questões de implementação complementam os slides e estão identificadas como apoio.
 
 ### A. Escolha e evolução da arquitetura
 
@@ -29,7 +29,7 @@ Reservar cerca de **4 minutos** da palestra de 40 minutos para perguntas. Usar a
 
 **Resposta breve:** é a hipótese de negócio: 95% das chamadas leem e 5% escrevem.
 
-**Aprofundamento:** no pico de 20.000 req/min, seriam 19.000 leituras e 1.000 escritas. Um HIT de 90% é uma segunda hipótese e deixa 1.900 leituras chegando ao banco. O motor de ramificações não aplica automaticamente esses percentuais.
+**Aprofundamento:** no pico ilustrativo de 20.000 req/min dos Labs, seriam 19.000 leituras e 1.000 escritas. O slide 13 fala em 90% de conteúdo estável. Um HIT de 90% é uma hipótese adicional do exercício e deixa 1.900 leituras chegando ao banco. O motor de ramificações não aplica automaticamente esses percentuais.
 
 #### 5. Como impedir que dois clientes comprem a última unidade?
 
@@ -50,6 +50,8 @@ Reservar cerca de **4 minutos** da palestra de 40 minutos para perguntas. Usar a
 **Aprofundamento:** réplicas A/B atendem leituras do catálogo com atraso possível. HA, distribuição de leitura e capacidade de escrita são decisões distintas. A promoção deve impedir que o writer antigo continue aceitando escrita.
 
 ### C. Resiliência e processamento assíncrono
+
+Outbox e DLQ são aprofundamento de implementação do nosso exemplo; o desenho original apresenta fila e worker.
 
 #### 8. Retry sempre melhora a disponibilidade?
 
@@ -87,7 +89,7 @@ Reservar cerca de **4 minutos** da palestra de 40 minutos para perguntas. Usar a
 
 **Resposta breve:** disponibilidade exige medição; RPO/RTO exigem teste de desastre.
 
-**Aprofundamento:** definir SLI, período de observação e SLO. As metas propostas de RPO ≤ 5 min e RTO ≤ 30 min precisam de ensaio de restore, promoção, fencing e roteamento. CDN mundial não torna o writer active-active nem substitui backup.
+**Aprofundamento:** definir SLI, período de observação e SLO. O slide 18 não fixa metas RPO/RTO. Os valores 5/30 min das versões anteriores eram hipóteses extras; definir metas exige ensaio de restore, promoção, fencing e roteamento. CDN mundial não torna o writer active-active nem substitui backup.
 
 ### E. Build Arch e repositório
 
@@ -109,10 +111,34 @@ Reservar cerca de **4 minutos** da palestra de 40 minutos para perguntas. Usar a
 
 **Aprofundamento:** o catálogo é sintético, checkout retorna 501 e relay/worker não processam eventos. O schema explicita invariantes; o comportamento de domínio está descrito nas notas técnicas. O objetivo ao importar do GitHub é revisar evidências de arquitetura.
 
-### F. Visão de apresentação
+### F. Correspondência com os slides
 
-#### 17. Onde estão os outros componentes do mapa completo?
+#### 17. Onde aparecem as peças da palestra?
 
-**Resposta breve:** a visão v10 agrupa as réplicas e mostra três jornadas; o mapa detalhado permanece na v9.
+**Resposta breve:** todas as funções da referência do slide 19 estão na v19, com réplicas, tracing e região retomando os slides 17–18.
 
-**Aprofundamento:** DNS, identidade, observabilidade, CI/CD e recuperação não foram descartados da arquitetura. Estão na revisão completa e nas notas técnicas. A simplificação serve para apresentar decisões em poucos minutos, sem misturar todas as relações de dados, controle e operação.
+**Aprofundamento:** v12 mostra a caixa única do slide 5; v13–v18 acompanham a construção original. Blocos incluem motivo, segurança e referência; [matriz dos 25 slides](../arquitetura/04-correspondencia-palestra.md) registra a cobertura. Versões anteriores continuam no histórico.
+
+#### 18. Circuit breaker faz o quê?
+
+**Resposta breve:** interrompe temporariamente chamadas a uma dependência que falha, contendo o problema.
+
+**Aprofundamento:** slide 12 combina timeout, retry e circuit breaker. Tentativas precisam de limite e idempotência quando repetem efeitos. A política pertence ao código/proxy da dependência; o desenho não inventa um serviço separado para ela.
+
+#### 19. Sala de espera é a mesma fila do worker?
+
+**Resposta breve:** são funções distintas: a primeira controla entrada; a segunda guarda trabalho posterior.
+
+**Aprofundamento:** slide 21 protege o acesso em pico extremo. Slide 18 desacopla e-mail/baixa operacional. Nenhuma substitui planejamento de capacidade.
+
+#### 20. Baixa de estoque pode esperar?
+
+**Resposta breve:** a operação posterior pode esperar; a decisão de vender exige reserva autoritativa.
+
+**Aprofundamento:** slide 18 trata a baixa no processamento assíncrono, enquanto slides 4/11/17 exigem correção no estoque da compra. Reservar no checkout e consolidar a baixa depois mantém as duas ideias. A implementação deve evitar liberar ou vender a mesma unidade duas vezes.
+
+#### 21. Por que comparar gerenciado e operação própria?
+
+**Resposta breve:** custo inclui a equipe que opera o sistema, além da infraestrutura.
+
+**Aprofundamento:** slide 24 compara compute, storage, egress e CDN. AWS, GCP, Azure e Alibaba Cloud são alternativas com pacotes próprios; a palestra evita preços fixos. Disponibilidade, suporte, observabilidade e esforço operacional também influenciam a decisão.

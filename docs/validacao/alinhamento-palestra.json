@@ -1,0 +1,311 @@
+{
+  "project": "Arquitetura Santa Cecília",
+  "version": 19,
+  "nodes": 23,
+  "edges": 40,
+  "sourceFiles": [
+    {
+      "filename": "Como projetar sistemas escaláveis, seguros e preparados para o mundo real.pptx",
+      "sha256": "82f8c08c9c4c8cdf957c174af9a93313b71a21df60f9435904e2328b8c9ec728",
+      "pagesOrSlides": 25
+    },
+    {
+      "filename": "Como projetar sistemas escaláveis, seguros e preparados para o mundo real.pdf",
+      "sha256": "a7d8cfb8ab5574c9683c3b8c06b18c2de6ec76746125b030bf58971932cdd0ce",
+      "pagesOrSlides": 25
+    }
+  ],
+  "comparison": "25 slides e 25 páginas conferidos; diferenças textuais identificadas são quebra de palavras/ligaduras da extração PDF.",
+  "coverage": [
+    {
+      "slide": 1,
+      "topic": "Tema e estudo de caso",
+      "nodes": [
+        "users"
+      ],
+      "revision": null,
+      "representation": "Título e 8 peças preservados como tema; nome do projeto continua Arquitetura Santa Cecília."
+    },
+    {
+      "slide": 2,
+      "topic": "Roteiro da palestra",
+      "nodes": [
+        "users"
+      ],
+      "revision": null,
+      "representation": "Problema, conceitos, construção, demonstração e custos aparecem no roteiro de apoio."
+    },
+    {
+      "slide": 3,
+      "topic": "Caso global, pico 10x e perfil 95/5",
+      "nodes": [
+        "users",
+        "catalog",
+        "checkout"
+      ],
+      "revision": null,
+      "representation": "Milhões de visitas/dia é contexto; nenhum req/min fixado pelo slide."
+    },
+    {
+      "slide": 4,
+      "topic": "Perguntas de negócio",
+      "nodes": [
+        "users",
+        "checkout",
+        "primary",
+        "region"
+      ],
+      "revision": null,
+      "representation": "Origem, pico, criticidade e atraso tolerado descritos antes das peças."
+    },
+    {
+      "slide": 5,
+      "topic": "Tudo numa caixa só",
+      "nodes": [
+        "users",
+        "app1",
+        "primary"
+      ],
+      "revision": 12,
+      "representation": "Estado inicial sem redundância preservado em revisão própria."
+    },
+    {
+      "slide": 6,
+      "topic": "Latência e throughput",
+      "nodes": [
+        "metrics",
+        "catalog"
+      ],
+      "revision": null,
+      "representation": "Unidades e significado separados; números do modelo não são medição real."
+    },
+    {
+      "slide": 7,
+      "topic": "Disponibilidade e custo",
+      "nodes": [
+        "metrics",
+        "region"
+      ],
+      "revision": null,
+      "representation": "99%, 99,9%, 99,99%, 99,999% permanecem no material; nenhuma meta extra imposta."
+    },
+    {
+      "slide": 8,
+      "topic": "Escala vertical e horizontal",
+      "nodes": [
+        "catalog",
+        "checkout",
+        "autoscaler"
+      ],
+      "revision": 15,
+      "representation": "App 1/2/3 na evolução; grupos com 3 instâncias no principal."
+    },
+    {
+      "slide": 9,
+      "topic": "Cache",
+      "nodes": [
+        "redis",
+        "catalog"
+      ],
+      "revision": 16,
+      "representation": "Absorção de leituras e diferença entre HIT e MISS."
+    },
+    {
+      "slide": 10,
+      "topic": "Balanceamento",
+      "nodes": [
+        "lb"
+      ],
+      "revision": 14,
+      "representation": "Distribuição e exclusão de instância sem resposta."
+    },
+    {
+      "slide": 11,
+      "topic": "Consistência forte e eventual",
+      "nodes": [
+        "primary",
+        "read1",
+        "read2",
+        "redis",
+        "checkout"
+      ],
+      "revision": 17,
+      "representation": "Compra usa fonte da verdade; catálogo aceita propagação."
+    },
+    {
+      "slide": 12,
+      "topic": "Timeout, retry e circuit breaker",
+      "nodes": [
+        "catalog",
+        "checkout"
+      ],
+      "revision": null,
+      "representation": "Descritos nas dependências; não apresentados como serviços novos."
+    },
+    {
+      "slide": 13,
+      "topic": "Cliente, DNS e CDN",
+      "nodes": [
+        "users",
+        "dns",
+        "cdn"
+      ],
+      "revision": 13,
+      "representation": "Relações DNS/HTTPS distintas; 90% conteúdo estável preservado sem converter em HIT."
+    },
+    {
+      "slide": 14,
+      "topic": "Load Balancer e TLS",
+      "nodes": [
+        "lb"
+      ],
+      "revision": 14,
+      "representation": "Terminação e nova sessão TLS explicam os dois trechos HTTPS."
+    },
+    {
+      "slide": 15,
+      "topic": "Múltiplas instâncias e autorização",
+      "nodes": [
+        "catalog",
+        "checkout",
+        "identity"
+      ],
+      "revision": 15,
+      "representation": "3 caixas explícitas no estágio; validação antes do domínio."
+    },
+    {
+      "slide": 16,
+      "topic": "Cache e proteção dos dados",
+      "nodes": [
+        "redis"
+      ],
+      "revision": 16,
+      "representation": "Pagamento/documentos fora do cache; TTL pessoal curto."
+    },
+    {
+      "slide": 17,
+      "topic": "Writer e réplicas",
+      "nodes": [
+        "primary",
+        "read1",
+        "read2"
+      ],
+      "revision": 17,
+      "representation": "Duas réplicas separadas; repouso criptografado e menor privilégio."
+    },
+    {
+      "slide": 18,
+      "topic": "Assíncrono, observabilidade e multi-região",
+      "nodes": [
+        "queue",
+        "worker",
+        "metrics",
+        "logs",
+        "tracing",
+        "region",
+        "dns",
+        "read2"
+      ],
+      "revision": 18,
+      "representation": "50 mil mensagens/h, 3→20 workers, aviso 3 min, 40/220 ms preservados como exemplos do slide."
+    },
+    {
+      "slide": 19,
+      "topic": "Arquitetura de referência",
+      "nodes": [
+        "users",
+        "dns",
+        "waf",
+        "cdn",
+        "lb",
+        "identity",
+        "orchestrator",
+        "catalog",
+        "checkout",
+        "worker",
+        "autoscaler",
+        "primary",
+        "redis",
+        "queue",
+        "metrics",
+        "logs",
+        "delivery",
+        "staticanalysis"
+      ],
+      "revision": 19,
+      "representation": "Todas as funções da figura representadas; duas réplicas e tracing retomam os slides 17–18."
+    },
+    {
+      "slide": 20,
+      "topic": "Deploy gradual e rollback",
+      "nodes": [
+        "delivery",
+        "metrics",
+        "orchestrator"
+      ],
+      "revision": 19,
+      "representation": "Fração do tráfego/região; métricas orientam retorno."
+    },
+    {
+      "slide": 21,
+      "topic": "Pico além do planejado",
+      "nodes": [
+        "lb",
+        "waiting",
+        "catalog",
+        "autoscaler"
+      ],
+      "revision": 19,
+      "representation": "Rate limiting, sala de espera, modo degradado, teto e alarme."
+    },
+    {
+      "slide": 22,
+      "topic": "Carga ao vivo",
+      "nodes": [
+        "users",
+        "lb",
+        "catalog",
+        "redis",
+        "primary"
+      ],
+      "revision": 19,
+      "representation": "Mapa mostra as peças; Labs demonstram causalidade com controles iguais."
+    },
+    {
+      "slide": 23,
+      "topic": "Gargalo orienta investimento",
+      "nodes": [
+        "metrics",
+        "primary",
+        "autoscaler"
+      ],
+      "revision": 19,
+      "representation": "Comparação dos Labs 01/02/03 preservada."
+    },
+    {
+      "slide": 24,
+      "topic": "Compute, storage, egress e CDN",
+      "nodes": [
+        "orchestrator",
+        "primary",
+        "cdn",
+        "region"
+      ],
+      "revision": 19,
+      "representation": "AWS, GCP, Azure e Alibaba no guia; preços fixos não adicionados."
+    },
+    {
+      "slide": 25,
+      "topic": "Evolução, segurança e caminho de volta",
+      "nodes": [
+        "delivery",
+        "waiting",
+        "autoscaler",
+        "region"
+      ],
+      "revision": 19,
+      "representation": "Histórico e controles demonstram fechamento sem mudar as fontes."
+    }
+  ],
+  "additionalMaterial": "Outbox, DLQ, idempotência detalhada e schema sintético permanecem como aprofundamento do exemplo, identificados nas notas e versões anteriores."
+}

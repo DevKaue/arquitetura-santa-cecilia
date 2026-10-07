@@ -24,14 +24,28 @@ for (const file of files) {
   for (const revision of project.revisions ?? []) verifyGraph(revision);
   if (file.startsWith('00-')) {
     assert.equal(project.name, 'Arquitetura Santa Cecília');
-    assert.equal(project.version, 10);
-    assert.equal(project.nodes.length, 13);
-    assert.equal(project.edges.length, 13);
-    assert.equal(project.revisions.length, 10);
+    assert.equal(project.version, 19);
+    assert.equal(project.nodes.length, 23);
+    assert.equal(project.edges.length, 40);
+    assert.equal(project.revisions.length, 19);
     const full = project.revisions.find((revision) => revision.version === 9);
     assert.equal(full.nodes.length, 19, 'O mapa completo deve permanecer no histórico.');
     assert.equal(full.edges.length, 25);
-    assert.equal(project.nodes.find((node) => node.id === 'read1').data.instances, 2);
+    for (const id of ['read1', 'read2']) assert.equal(project.nodes.find((node) => node.id === id).data.instances, 1);
+    const alignment = JSON.parse(read('docs/validacao/alinhamento-palestra.json'));
+    assert.equal(alignment.coverage.length, 25);
+    assert.deepEqual(alignment.coverage.map((row) => row.slide), Array.from({ length: 25 }, (_, i) => i + 1));
+    for (const row of alignment.coverage) {
+      const snapshot = row.revision ? project.revisions.find((r) => r.version === row.revision) : project;
+      assert.ok(snapshot, `Revisão ausente para slide ${row.slide}`);
+      for (const id of row.nodes) assert.ok([...snapshot.nodes, ...project.nodes].some((n) => n.id === id), `Slide ${row.slide}: bloco ausente no principal/evolução ${id}`);
+    }
+    assert.deepEqual(project.revisions.find((r) => r.version === 15).nodes.filter((n) => /^app[123]$/.test(n.id)).map((n) => n.data.label), ['App 1', 'App 2', 'App 3']);
+    assert.equal(project.nodes.find((n) => n.id === 'worker').data.runtime.maxReplicas, 20);
+    for (const node of project.nodes) {
+      assert.ok(node.data.description.includes('Slide') || node.data.description.includes('slide'));
+      assert.ok(node.data.description.length <= 800, `Descrição excede limite do Build Arch: ${node.id}`);
+    }
     const tables = project.nodes.find((node) => node.id === 'primary').data.schema.tables;
     assert.equal(tables.length, 8);
     const byId = new Map(tables.map((table) => [table.id, table]));

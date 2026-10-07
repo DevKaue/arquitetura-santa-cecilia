@@ -1,62 +1,68 @@
 # Arquitetura Santa Cecília
 ## Resumo executivo para revisão
 
-**Evento:** palestra de arquitetura de software, Santa Cecília, 8 de outubro de 2026.  
-**Palestra completa:** 40 minutos. **Demonstração:** 10 minutos no Build Arch Desktop, com alternativa de 5 minutos.  
-**Repositório:** [DevKaue/arquitetura-santa-cecilia](https://github.com/DevKaue/arquitetura-santa-cecilia).  
-**Projeto principal:** Arquitetura Santa Cecília, visão de apresentação v10; mapa completo preservado na v9.
+**Referência:** os 25 slides do PPT e as 25 páginas do PDF “Como projetar sistemas escaláveis, seguros e preparados para o mundo real”, fornecidos para a palestra de 8 de outubro de 2026. **Principal no Build Arch Desktop: v19, 23 blocos, 40 relações.** O conteúdo acompanha a palestra inteira; a duração da fala fica a critério dos apresentadores.
 
-### 1. Objetivo da demonstração
+### O caso e as perguntas de negócio
 
-Transformar os conceitos dos slides em decisões visíveis: distribuir leituras, proteger a compra, retirar trabalho posterior do tempo de resposta e identificar o gargalo antes de aumentar a infraestrutura. A plateia acompanha três jornadas: consulta ao catálogo, compra transacional e processamento após a compra.
+Loja disponível em vários países, com clientes em vários continentes/fusos e milhões de visitas por dia. Black Friday pode multiplicar o tráfego por **10x**; o perfil é **95% leitura / 5% escrita**. Erros de estoque, pedido duplicado ou cobrança errada tornam checkout/pagamento críticos (slides 3–4).
 
-O exemplo mantém o caso de catálogo e compras apresentado no material da palestra. O nome do projeto é **Arquitetura Santa Cecília**. A visão de apresentação reúne 13 blocos e 13 relações em três jornadas, com as réplicas de leitura agrupadas. O mapa completo de 19 blocos/25 relações permanece na v9. Os três laboratórios foram mantidos; o roteiro compara apenas Labs 01 e 03, se houver tempo.
+Antes das peças: quantos usuários e de onde, qual pico, o que não pode cair e o que pode demorar a atualizar. Exibir estoque com atraso pode ser aceitável; decidir a compra exige o dado autoritativo.
 
-### 2. Problema e premissas
+### As oito peças explicadas na palestra
 
-| Premissa | Valor do exercício | Uso na explicação |
+| Peça | Função no principal | Referência |
 |---|---|---|
-| Tráfego normal | 2.000 requisições/min | Referência para comparação |
-| Pico de campanha | 20.000 requisições/min | Aumento de 10 vezes |
-| Perfil do negócio | 95% leitura; 5% escrita | Separar catálogo e compra |
-| Cache HIT ilustrativo | 90% das leituras | Calcular alívio no banco, sem confundir com roteamento do simulador |
+| Borda: cliente, DNS e CDN | Resolver destino e aproximar conteúdo estático; WAF/anti-DDoS na referência final | 13, 19 |
+| Load Balancer / entrada | Distribuir para instâncias saudáveis; TLS, limites e controle de acesso | 10, 14, 19, 21 |
+| Aplicação stateless | Escalar cópias sem sessão local; autenticação e autorização antes do domínio | 8, 15, 19 |
+| Cache | Absorver consultas repetidas; proteger dados sensíveis | 9, 16 |
+| Writer e réplicas | Separar escrita autoritativa e leitura eventual | 11, 17 |
+| Fila e workers | Retirar trabalho posterior da resposta; escalar por fila | 18–19 |
+| Observabilidade | Métricas, logs e tracing para identificar saturação e falhas | 18–19, 22–23 |
+| Multi-região | Proximidade do cliente e continuidade quando uma região falha | 18 |
 
-Com essas premissas, o pico produz 19.000 leituras e 1.000 escritas por minuto. Um HIT de 90% deixa 1.900 leituras chegando ao banco. Essa conta explica uma hipótese de arquitetura; a simulação de carga não aplica automaticamente a proporção 95/5 nem o cache HIT.
+### O desenho de referência e o mundo real
 
-### 3. Decisões centrais
+A v19 explicita as camadas do slide 19: **borda, entrada, orquestração, dados, observabilidade e entrega**. WAF e CDN são blocos separados. As duas réplicas continuam separadas. Autenticação, Kubernetes ou equivalente, autoscaler, dashboards, logs e análise estática têm função visível.
 
-| Tema | Decisão | Consequência a discutir |
-|---|---|---|
-| Leitura | CDN, cache-aside e réplicas | Ganho de latência/capacidade com atraso tolerado no catálogo |
-| Compra | Autorizar o dono; reservar no writer | Evitar venda sem estoque e acesso indevido a pedidos |
-| Pagamento | Idempotência e reconciliação | Timeout mantém resultado desconhecido até confirmação |
-| Assíncrono | Outbox, relay, consumidor e DLQ | Entrega pode repetir; o efeito precisa ser controlado |
-| Operação | Métricas, canary e rollback | Detectar degradação e reduzir o impacto de mudança |
-| Recuperação | Writer único e região secundária | RPO/RTO propostos exigem teste de restauração e failover |
+O mapa também inclui tracing e região secundária do slide 18. **Sala de espera** representa a política opcional do slide 21, distinta da fila de trabalho. Timeout/retry/circuit breaker, modo degradado, teto de escala, alarme, canary e rollback estão descritos nas peças responsáveis. Nenhum deles depende de acrescentar uma caixa fictícia para cada conceito.
 
-### 4. Evidência disponível para a demonstração
+### Exemplos numéricos preservados das fontes
 
-No cenário temporal de pico 4x, com a mesma entrada, os Labs 01 e 02 produzem latência estimada de 895 ms e erro estimado de 68%. A API cresce de uma para seis instâncias, mas o banco permanece limitante. No Lab 03, a capacidade cadastrada do banco aumenta e os valores passam a 48 ms e 0,05%.
-
-Como exercício complementar, fora do roteiro principal, na carga ao vivo 10x, são geradas 10.000 requisições em 30 segundos virtuais. Após o limite de drenagem, Labs 01/02 deixam aproximadamente 2.650 pendentes; o Lab 03 termina sem pendências. São resultados do modelo do Build Arch, sem representar benchmark HTTP ou SLA real.
-
-O Compose declara nove serviços. A inferência estática pelo motor do Build Arch identificou 23 blocos e 22 relações, incluindo redes, volume, imagens e abstrações de software. Esse resultado permite explicar a revisão humana de um mapa extraído do GitHub.
-
-### 5. Alinhamento com os slides
-
-| Slides | Ponto de revisão |
+| Exemplo da palestra | Significado |
 |---|---|
-| 3–4 | Retomar o caso e explicitar que os números são premissas |
-| 11 | Consistência depende das operações e do isolamento adotado |
-| 14 | TLS pode terminar na entrada; nova sessão protege o backend |
-| 18 | Reserva de estoque ocorre no checkout; notificação pode esperar |
-| 19–21 | Relacionar segurança, observabilidade, canary e limite de escala |
-| 22–23 | Diferenciar simulação temporal 4x, carga ao vivo 10x e gargalo compartilhado |
+| 95% / 5%; pico 10x | Perfil de leitura/escrita e crescimento do tráfego |
+| 90% de conteúdo estável | Justificativa da CDN no slide 13; não é taxa de cache HIT medida |
+| 50 mil mensagens por hora; 3 para 20 workers | Exemplo assíncrono do slide 18 |
+| Latência aumenta 3 min antes do primeiro erro | Exemplo de observação do slide 18; antecipação não garantida |
+| 40 ms local / 220 ms cruzando o Atlântico | Exemplo de proximidade regional do slide 18 |
+| 99% | Aproximadamente 3,65 dias fora do ar/ano, no slide 7 |
+| 99,9% | Aproximadamente 8,8 horas fora do ar/ano |
+| 99,99% | Aproximadamente 52 minutos fora do ar/ano |
+| 99,999% | Aproximadamente 5 minutos fora do ar/ano |
 
-### 6. Escopo e revisão proposta
+Os slides não definem 2.000 req/min, TTL de 60 s, cache HIT de 90% ou metas numéricas RPO/RTO. Esses parâmetros surgiram no aprofundamento anterior e nos Labs; não são apresentados como dados do material original.
 
-O repositório publica o modelo, os manifests e as notas técnicas. Os servidores são um esqueleto para inferência: catálogo sintético, health endpoints e checkout com resposta 501. Pagamento, consumidor e relay reais não estão implementados. A sintaxe do Compose foi validada; os containers não foram executados.
+### Evolução disponível no histórico
 
-A distribuição sugerida é 26 minutos de slides/conclusão, 10 de demonstração e 4 de perguntas. A demo não exige montagem de componentes, navegação por versões nem modelagem de dados ao vivo.
+| Revisão | O que mostrar |
+|---|---|
+| v12 | Slide 5: servidor e banco únicos |
+| v13 | Slide 13: cliente, DNS e CDN |
+| v14 | Slide 14: entrada e TLS |
+| v15 | Slide 15: App 1, App 2 e App 3 |
+| v16 | Slide 16: cache |
+| v17 | Slide 17: writer e duas réplicas |
+| v18 | Slide 18: fila, observabilidade e multi-região |
+| v19 | Referência completa e operação dos slides 19–25 |
 
-Para revisar, abrir o backup principal, acompanhar o roteiro curto e conferir: separação leitura/compra, reserva concorrente, idempotência, evento de confirmação de compra, limites de retry, DLQ, redundância e metas de recuperação. Revisar especialmente as correções propostas para os slides 14 e 18 antes do ensaio conjunto.
+As versões v1–v10 e o estado do Desktop anterior à reorganização (v11) foram preservados. A v9 mantém outbox, relay, DLQ e pagamento externo como aprofundamento. Os três Labs e o schema de oito tabelas continuam disponíveis.
+
+### Demonstração, custos e fechamento
+
+Slides 22–23: elevar a carga, observar latência, saturação e qual peça limita o sistema. Os Labs com os mesmos controles mostram que aumentar APIs não resolve um banco compartilhado limitante. As saídas dos motores são estimativas de modelo; P95 de produção exige instrumentação e teste reais.
+
+Slide 24: comparar **compute, storage, egress e CDN**, além do esforço de operação, em AWS, GCP, Azure e Alibaba Cloud. As marcas são alternativas; não são serviços simultâneos nem preços fixos. Campos de custo do Build Arch são didáticos.
+
+Slide 25: arquitetura evolui com o problema, segurança acompanha cada peça e operação precisa de medição e caminho de volta. A [correspondência dos 25 slides](../arquitetura/04-correspondencia-palestra.md) permite conferir a cobertura com a chefia. O [roteiro curto opcional](05-roteiro-curto-opcional.md) mantém as alternativas de 10/5 min, sem determinar o conteúdo do principal.

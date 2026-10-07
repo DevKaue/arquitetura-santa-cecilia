@@ -1,5 +1,7 @@
 # Checkout, reservas e eventos
 
+**Aprofundamento do exemplo:** estes detalhes de implementação complementam a palestra; não fazem parte da figura original do slide 19. A referência por slide está na [matriz de correspondência](04-correspondencia-palestra.md).
+
 O código HTTP demonstra contratos de entrada; checkout responde 501. Esta nota descreve o comportamento que uma implementação transacional precisaria cumprir.
 
 ## 1. Entrada e repetição segura
