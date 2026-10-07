@@ -1,7 +1,10 @@
 # Arquitetura Santa Cecília
 ## Roteiro da demonstração conforme a palestra
 
-O roteiro segue a ordem e o conteúdo do PPT/PDF. **A duração fica a critério de vocês.** Abrir o principal em **Trabalho atual · v19**, conferir **Salvo agora** e enquadrar o canvas. As conexões de DNS, orquestração, telemetria e entrega têm função de controle/operação; não são todas etapas de uma compra.
+O roteiro segue a ordem e o conteúdo do PPT/PDF. **A duração fica a critério de vocês.** Abrir o principal em **Trabalho atual · v22**, conferir **Salvo agora** e enquadrar o canvas. As conexões de DNS, orquestração, telemetria e entrega têm função de controle/operação; não são todas etapas de uma compra.
+
+
+Para a disposição atual e os ganchos das oito peças, usar o [guia de leitura por camadas](07-guia-de-leitura-por-camadas.md).
 
 ### 1. O problema antes do desenho — slides 3–5
 
@@ -65,9 +68,9 @@ Segurança do slide: criptografia em repouso e usuários de menor privilégio. U
 
 **Multi-região:** mostrar DNS geográfico, região secundária e réplica próxima. O caso compara **40 ms local** com **220 ms transatlântico**. Considerar residência de dados. Falha de região exige capacidade de assumir, dados disponíveis e mudança de roteamento; o slide não fixa RPO/RTO.
 
-### 9. Arquitetura de referência completa — slide 19, v19
+### 9. Arquitetura de referência completa — slide 19, v22
 
-**Ação:** voltar a **Trabalho atual · v19**. Percorrer as camadas visíveis: borda; entrada/identidade; apps/orquestração/autoscaler; dados; observabilidade; entrega.
+**Ação:** voltar a **Trabalho atual · v22**. Percorrer as camadas visíveis: borda; entrada/identidade; apps/orquestração/autoscaler; dados; observabilidade; entrega.
 
 **Fala:** “O provedor e os nomes das ferramentas podem mudar. A função de cada camada é a mesma do desenho dos slides.”
 

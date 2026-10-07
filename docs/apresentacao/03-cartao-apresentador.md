@@ -1,7 +1,10 @@
 # Arquitetura Santa Cecília
 ## Cartão do apresentador
 
-**Principal: v19 · 23 blocos · 40 relações.** Enquadrar o canvas e conferir **Salvo agora**. A sequência segue os slides; ajustar a duração durante o ensaio conjunto.
+**Principal: v22 · 23 blocos · 40 relações · camadas e jornadas.** Enquadrar o canvas e conferir **Salvo agora**. A sequência segue os slides; ajustar a duração durante o ensaio conjunto.
+
+
+Para a disposição atual e os ganchos das oito peças, usar o [guia de leitura por camadas](07-guia-de-leitura-por-camadas.md).
 
 | Slides | O que apontar | Frase para ligar ao conteúdo |
 |---|---|---|
@@ -13,7 +16,7 @@
 | 16 / v16 | Cache | “Consulta repetida não precisa chegar ao banco.” |
 | 17 / v17 | Writer / duas réplicas | “Catálogo aceita atraso; compra usa a fonte da verdade.” |
 | 18 / v18 | Fila, telemetria, região | “Trabalho posterior, visibilidade e proximidade.” |
-| 19 / v19 | Todas as camadas | “A tecnologia muda; a função permanece.” |
+| 19 / v22 | Todas as camadas | “A tecnologia muda; a função permanece.” |
 | 20–21 | Canary, teto, espera | “Reduzir o alcance do erro e controlar a entrada.” |
 | 22–23 | Labs 01/02/03 | “Escalar a peça errada mantém o gargalo.” |
 | 24–25 | Custos / histórico | “Medir, escolher e manter caminho de volta.” |

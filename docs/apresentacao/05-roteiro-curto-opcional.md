@@ -1,6 +1,6 @@
 # Opções de condução em 10 ou 5 minutos
 
-Estas opções preservam o pedido anterior como recurso de ensaio. **O principal v19 contém o conteúdo completo da palestra.** O apresentador escolhe a duração; o mapa não foi reduzido para caber neste cartão.
+Estas opções preservam o pedido anterior como recurso de ensaio. **O principal v22 contém o conteúdo completo da palestra, organizado por camadas.** O apresentador escolhe a duração; o mapa não foi reduzido para caber neste cartão.
 
 ## Opção de 10 minutos
 

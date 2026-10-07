@@ -1,7 +1,10 @@
 # Arquitetura Santa Cecília
 ## Resumo executivo para revisão
 
-**Referência:** os 25 slides do PPT e as 25 páginas do PDF “Como projetar sistemas escaláveis, seguros e preparados para o mundo real”, fornecidos para a palestra de 8 de outubro de 2026. **Principal no Build Arch Desktop: v19, 23 blocos, 40 relações.** O conteúdo acompanha a palestra inteira; a duração da fala fica a critério dos apresentadores.
+**Referência:** os 25 slides do PPT e as 25 páginas do PDF “Como projetar sistemas escaláveis, seguros e preparados para o mundo real”, fornecidos para a palestra de 8 de outubro de 2026. **Principal no Build Arch Desktop: v22, 23 blocos, 40 relações, organizados por camadas e jornadas.** O conteúdo acompanha a palestra inteira; a duração da fala fica a critério dos apresentadores.
+
+
+Para a disposição atual e os ganchos das oito peças, usar o [guia de leitura por camadas](07-guia-de-leitura-por-camadas.md).
 
 ### O caso e as perguntas de negócio
 

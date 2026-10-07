@@ -1,6 +1,6 @@
 # Apresentação linear: ganchos dos slides
 
-**Build Arch Desktop: Trabalho atual · v21.** Todos os 23 blocos estão alinhados numa faixa horizontal, numerados da esquerda para a direita. O conteúdo da v19 foi preservado; a v20 guarda a organização que estava no Desktop antes desta mudança.
+**Guia histórico da v21.** Para a apresentação atual, usar o [guia por camadas da v22](07-guia-de-leitura-por-camadas.md). Todos os 23 blocos estão alinhados numa faixa horizontal, numerados da esquerda para a direita. O conteúdo da v19 foi preservado; a v20 guarda a organização que estava no Desktop antes desta mudança.
 
 ## Como conduzir a explicação
 

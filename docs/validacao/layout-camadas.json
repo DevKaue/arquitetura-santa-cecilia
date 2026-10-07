@@ -1,0 +1,246 @@
+{
+  "version": 22,
+  "referenceVersion": 19,
+  "preservedLinearVersion": 21,
+  "nodeCount": 23,
+  "edgeCount": 40,
+  "layout": "camadas-e-jornadas",
+  "referenceSlides": [
+    13,
+    14,
+    15,
+    16,
+    17,
+    18,
+    19,
+    20,
+    21
+  ],
+  "nodeEnvelope": {
+    "width": 360,
+    "height": 240
+  },
+  "groups": {
+    "borda": [
+      "users",
+      "dns",
+      "waf",
+      "cdn"
+    ],
+    "entrada": [
+      "lb",
+      "identity",
+      "waiting"
+    ],
+    "aplicacoes": [
+      "catalog",
+      "checkout"
+    ],
+    "dados": [
+      "redis",
+      "primary",
+      "read1",
+      "read2"
+    ],
+    "assincrono": [
+      "queue",
+      "worker"
+    ],
+    "regiao": [
+      "region"
+    ],
+    "observabilidade": [
+      "metrics",
+      "logs",
+      "tracing"
+    ],
+    "entrega": [
+      "staticanalysis",
+      "delivery"
+    ],
+    "orquestracao": [
+      "orchestrator",
+      "autoscaler"
+    ]
+  },
+  "positions": {
+    "users": {
+      "x": 0,
+      "y": 470
+    },
+    "dns": {
+      "x": 0,
+      "y": 100
+    },
+    "waf": {
+      "x": 400,
+      "y": 470
+    },
+    "cdn": {
+      "x": 800,
+      "y": 470
+    },
+    "lb": {
+      "x": 1200,
+      "y": 470
+    },
+    "identity": {
+      "x": 1200,
+      "y": 60
+    },
+    "waiting": {
+      "x": 1200,
+      "y": 860
+    },
+    "catalog": {
+      "x": 1620,
+      "y": 280
+    },
+    "checkout": {
+      "x": 1620,
+      "y": 690
+    },
+    "redis": {
+      "x": 2050,
+      "y": 110
+    },
+    "primary": {
+      "x": 2050,
+      "y": 690
+    },
+    "read1": {
+      "x": 2460,
+      "y": 110
+    },
+    "read2": {
+      "x": 2460,
+      "y": 390
+    },
+    "queue": {
+      "x": 2050,
+      "y": 1120
+    },
+    "worker": {
+      "x": 2460,
+      "y": 1120
+    },
+    "region": {
+      "x": 2460,
+      "y": 780
+    },
+    "metrics": {
+      "x": 2940,
+      "y": 200
+    },
+    "logs": {
+      "x": 2940,
+      "y": 600
+    },
+    "tracing": {
+      "x": 2940,
+      "y": 1000
+    },
+    "staticanalysis": {
+      "x": 800,
+      "y": 1560
+    },
+    "delivery": {
+      "x": 1200,
+      "y": 1560
+    },
+    "orchestrator": {
+      "x": 1620,
+      "y": 1560
+    },
+    "autoscaler": {
+      "x": 2050,
+      "y": 1560
+    }
+  },
+  "readingOrder": [
+    {
+      "piece": 1,
+      "slides": [
+        13
+      ],
+      "nodes": [
+        "users",
+        "dns",
+        "cdn"
+      ]
+    },
+    {
+      "piece": 2,
+      "slides": [
+        14
+      ],
+      "nodes": [
+        "lb"
+      ]
+    },
+    {
+      "piece": 3,
+      "slides": [
+        15
+      ],
+      "nodes": [
+        "catalog",
+        "checkout",
+        "identity"
+      ]
+    },
+    {
+      "piece": 4,
+      "slides": [
+        16
+      ],
+      "nodes": [
+        "redis"
+      ]
+    },
+    {
+      "piece": 5,
+      "slides": [
+        17
+      ],
+      "nodes": [
+        "primary",
+        "read1",
+        "read2"
+      ]
+    },
+    {
+      "piece": 6,
+      "slides": [
+        18
+      ],
+      "nodes": [
+        "queue",
+        "worker"
+      ]
+    },
+    {
+      "piece": 7,
+      "slides": [
+        18
+      ],
+      "nodes": [
+        "metrics",
+        "logs",
+        "tracing"
+      ]
+    },
+    {
+      "piece": 8,
+      "slides": [
+        18
+      ],
+      "nodes": [
+        "dns",
+        "region",
+        "read2"
+      ]
+    }
+  ],
+  "semantics": "Fluxos e conteúdo técnico da referência preservados. Agrupamento por posição, sem novos serviços fictícios ou encadeamento de todas as peças."
+}

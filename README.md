@@ -13,7 +13,7 @@ Repositório: https://github.com/DevKaue/arquitetura-santa-cecilia
 Referência:  main
 ```
 
-Executar a análise, revisar evidências e abrir o rascunho gerado. O Compose descreve nove serviços, redes e volume. A inferência verificada identificou 23 blocos e 22 relações; esse mapa inclui imagens e abstrações de software. O desenho revisado em [buildarch/](buildarch/) está em **v21: 23 blocos numerados numa faixa horizontal, 40 relações e 21 revisões**. A v19 preserva a referência por camadas; a v20 guarda a organização que estava no Desktop. v12–v19 correspondem aos slides 5 e 13–19. A numeração indica ordem de explicação, mantendo as relações técnicas e as duas réplicas separadas.
+Executar a análise, revisar evidências e abrir o rascunho gerado. O Compose descreve nove serviços, redes e volume. A inferência verificada identificou 23 blocos e 22 relações; esse mapa inclui imagens e abstrações de software. O desenho revisado em [buildarch/](buildarch/) está em **v22: 23 blocos organizados por camadas e jornadas, 40 relações e 22 revisões**. Borda/entrada à esquerda, catálogo e compra em ramos distintos, dados e trabalho posterior próximos das aplicações, observabilidade à direita e entrega/orquestração na base. A referência v19, os ajustes v20 e a organização linear v21 permanecem no histórico. v12–v19 correspondem aos slides 5 e 13–19. O guia de leitura acompanha as oito peças da palestra e os temas de operação, sem transformar controle/telemetria em etapas HTTP.
 
 ## Navegação
 
@@ -23,7 +23,7 @@ Executar a análise, revisar evidências e abrir o rascunho gerado. O Compose de
 | [Roteiro conforme a palestra](docs/apresentacao/02-roteiro-demonstracao.md) | Conduzir a demonstração e importar do GitHub |
 | [Cartão do apresentador](docs/apresentacao/03-cartao-apresentador.md) | Consultar parâmetros e sequência durante o ensaio |
 | [Perguntas e respostas](docs/apresentacao/04-perguntas-respostas.md) | Apoiar a discussão com a plateia |
-| [Guia de ganchos da versão linear](docs/apresentacao/06-guia-linear-e-ganchos.md) | Retomar a fala do chefe em cada bloco numerado |
+| [Guia de leitura por camadas](docs/apresentacao/07-guia-de-leitura-por-camadas.md) | Retomar as oito peças dos slides e acompanhar catálogo e compra |
 | [Guia da referência v19 em PDF](docs/apresentacao/guia-da-palestra.pdf) | Consultar o conteúdo completo e a correspondência dos slides |
 | [Visão e decisões](docs/arquitetura/01-visao-e-decisoes.md) | Jornadas, trade-offs e operação |
 | [Modelo de dados](docs/arquitetura/02-modelo-de-dados.md) | Pedidos, reservas, outbox e deduplicação |

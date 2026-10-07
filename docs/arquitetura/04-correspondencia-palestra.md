@@ -2,7 +2,7 @@
 
 Os 25 slides do PPT e as 25 páginas do PDF foram comparados. A extração mostrou diferenças de quebra de palavras e ligaduras; os temas, exemplos e a sequência coincidem. As fontes originais permanecem intactas, fora do repositório público. Hashes e cobertura por slide estão no [registro de alinhamento](../validacao/alinhamento-palestra.json).
 
-O principal é **v19**, com **23 blocos e 40 relações**. A correspondência abaixo identifica funções do material original e complementos de implementação. Não significa que os slides comprovam a infraestrutura ou os resultados de produção.
+O principal atual é **v22**, com **23 blocos e 40 relações**, organizado por camadas e jornadas. O conteúdo técnico da referência **v19** permanece igual. A correspondência abaixo identifica funções do material original e complementos de implementação. Não significa que os slides comprovam a infraestrutura ou os resultados de produção.
 
 | Slide / página | Conteúdo original | Representação no Build Arch |
 |---|---|---|

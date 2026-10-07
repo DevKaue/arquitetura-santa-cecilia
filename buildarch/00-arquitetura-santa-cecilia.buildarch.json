@@ -1,6 +1,6 @@
 {
   "category": "software",
-  "description": "Versão linear para a explicação do e-commerce da palestra. 23 blocos numerados, da esquerda para a direita, seguindo os ganchos dos slides: público global, DNS/CDN, entrada, apps/identidade, cache, writer/réplicas, fila/worker, observabilidade, multi-região, referência final, entrega e proteção do pico. Números indicam ordem da fala; conexões mantêm suas funções reais de dados, controle, replicação e operação. Navegar pelo trecho explicado em zoom legível. v19 e a organização anterior do Desktop permanecem no histórico. Guia de ganchos em docs/apresentacao/06-guia-linear-e-ganchos.md. Motivos, segurança e exemplos dos slides preservados.",
+  "description": "E-commerce global da palestra: 95% leitura, 5% escrita e pico 10x. Desenho por camadas, baseado na referência do slide 19 e nas peças dos slides 13–18. Borda e entrada à esquerda; aplicações ao centro; cache/réplicas no ramo de leitura, writer no ramo de compra e fila/notificações abaixo. Observabilidade à direita; entrega, orquestração e autoscaler na base. Região secundária junto à réplica regional. Explicar as 8 peças na ordem da palestra e depois percorrer catálogo e compra. DNS, identidade e operação têm funções próprias. Exemplos e segurança dos slides preservados. Guia: docs/apresentacao/07-guia-de-leitura-por-camadas.md. v19–v21 e a evolução anterior permanecem no histórico.",
   "edges": [
     {
       "animated": false,
@@ -588,7 +588,7 @@
         "description": "BORDA | Slides 3–4, 13, 19. Clientes em vários continentes e fusos; milhões de visitas/dia. Black Friday: pico 10x. Perfil do caso: 95% leitura (catálogo, busca, produtos) e 5% escrita. Checkout e pagamento têm maior impacto de negócio. Os slides não fixam req/min; 2.000/20.000 pertencem aos Labs. Perguntas: quantos usuários, de onde, qual pico e o que pode atrasar?",
         "instances": 1,
         "kind": "client",
-        "label": "01 Público",
+        "label": "Usuários globais",
         "latency": 10,
         "memory": 30,
         "monthlyCost": 0,
@@ -599,7 +599,7 @@
       "id": "users",
       "position": {
         "x": 0,
-        "y": 0
+        "y": 470
       },
       "type": "architecture"
     },
@@ -613,7 +613,7 @@
         "description": "BORDA | Slides 13, 18–19. Resolve o domínio e orienta o destino regional; não transporta cada requisição HTTPS. Consulta DNS e tráfego da aplicação são relações distintas. Health checks e política de roteamento participam da troca de região. Proximidade geográfica e continuidade são os motivos da peça. Exemplos de provedores vêm dos slides; a escolha concreta permanece aberta.",
         "instances": 2,
         "kind": "network",
-        "label": "02 DNS",
+        "label": "DNS geográfico",
         "latency": 10,
         "memory": 30,
         "monthlyCost": 0,
@@ -623,8 +623,33 @@
       },
       "id": "dns",
       "position": {
+        "x": 0,
+        "y": 100
+      },
+      "type": "architecture"
+    },
+    {
+      "data": {
+        "availability": 99.95,
+        "capacity": 200000,
+        "cpu": 30,
+        "currentLoad": 12000,
+        "deployment": {},
+        "description": "BORDA | Slide 19. Proteção contra tráfego malicioso e ataques volumétricos antes da aplicação. Regras e bloqueios complementam o rate limiting da entrada. Autenticação e autorização continuam nas APIs; WAF não conhece todas as regras do domínio. Sem acesso público direto a banco, cache ou fila. Provedor não definido no material.",
+        "instances": 2,
+        "kind": "gateway",
+        "label": "WAF / anti-DDoS",
+        "latency": 10,
+        "memory": 30,
+        "monthlyCost": 0,
+        "replicas": 2,
+        "storage": 8,
+        "technology": "WAF / proteção DDoS"
+      },
+      "id": "waf",
+      "position": {
         "x": 400,
-        "y": 0
+        "y": 470
       },
       "type": "architecture"
     },
@@ -638,7 +663,7 @@
         "description": "BORDA | Slides 13–14, 18–19. Imagens, CSS e JS perto do usuário, reduzindo latência e trabalho do backend. Slide 13: 90% do catálogo é conteúdo que não muda a cada visita; isso não equivale a uma taxa de cache HIT medida. Conteúdo dinâmico segue à entrada. Não cachear dados de pagamento/documentos. CloudFront e Cloudflare aparecem também como exemplos de alcance global no slide 18.",
         "instances": 2,
         "kind": "gateway",
-        "label": "03 CDN",
+        "label": "CDN global",
         "latency": 10,
         "memory": 30,
         "monthlyCost": 0,
@@ -649,7 +674,7 @@
       "id": "cdn",
       "position": {
         "x": 800,
-        "y": 0
+        "y": 470
       },
       "type": "architecture"
     },
@@ -663,7 +688,7 @@
         "description": "ENTRADA | Slides 10, 14, 19, 21. Distribui tráfego entre instâncias saudáveis e retira quem não responde. TLS termina na entrada; uma nova sessão TLS protege o trecho até o backend, atendendo HTTPS em todos os trechos citados no slide. Rate limiting por identidade/origem; limites de conexão e timeout. Quando o pico excede o planejado, controlar acesso e preservar checkout/catálogo.",
         "instances": 2,
         "kind": "gateway",
-        "label": "04 Entrada",
+        "label": "Gateway / LB",
         "latency": 10,
         "memory": 30,
         "monthlyCost": 250,
@@ -673,8 +698,58 @@
       },
       "id": "lb",
       "position": {
-        "x": 1360,
-        "y": 0
+        "x": 1200,
+        "y": 470
+      },
+      "type": "architecture"
+    },
+    {
+      "data": {
+        "availability": 99.95,
+        "capacity": 40000,
+        "cpu": 30,
+        "currentLoad": 8000,
+        "deployment": {},
+        "description": "ENTRADA | Slides 15, 19. Alternativas do slide: Auth0, Keycloak, Cognito. As APIs conferem identidade e autorização antes do domínio. Catálogo público pode ser anônimo; recursos privados exigem permissão. Token válido não autoriza ler o pedido de outro cliente. Relações representam configuração/validação de identidade; não implicam chamada ao provedor em cada request.",
+        "instances": 2,
+        "kind": "service",
+        "label": "Autenticação",
+        "latency": 10,
+        "memory": 30,
+        "monthlyCost": 0,
+        "replicas": 2,
+        "storage": 8,
+        "technology": "OAuth2/OIDC / Keycloak"
+      },
+      "id": "identity",
+      "position": {
+        "x": 1200,
+        "y": 60
+      },
+      "type": "architecture"
+    },
+    {
+      "data": {
+        "availability": 99.95,
+        "capacity": 200000,
+        "cpu": 30,
+        "currentLoad": 12000,
+        "deployment": {},
+        "description": "ENTRADA | Slide 21. Em pico extremo, uma fila de acesso controla quantos clientes entram por vez. É uma política da entrada, ativada quando necessária; não é a fila de tarefas pós-compra. Rate limiting, espera e capacidade planejada trabalham juntos. Esta relação mostra controle de admissão, não uma dependência obrigatória em toda navegação.",
+        "instances": 2,
+        "kind": "gateway",
+        "label": "Sala de espera",
+        "latency": 10,
+        "memory": 30,
+        "monthlyCost": 0,
+        "replicas": 2,
+        "storage": 8,
+        "technology": "Controle de admissão"
+      },
+      "id": "waiting",
+      "position": {
+        "x": 1200,
+        "y": 860
       },
       "type": "architecture"
     },
@@ -688,7 +763,7 @@
         "description": "ORQUESTRAÇÃO | Slides 8–9, 15–17, 19, 21. Três instâncias de referência, descartáveis e sem estado local de sessão. Consultas repetidas usam cache; MISS consulta uma réplica saudável. Catálogo pode aceitar atraso de propagação. Timeout, retry limitado e circuit breaker isolam dependências lentas (slide 12). Modo degradado pode desligar recomendações/avaliações para preservar catálogo e checkout.",
         "instances": 3,
         "kind": "service",
-        "label": "05 Catálogo",
+        "label": "API de catálogo",
         "latency": 10,
         "memory": 30,
         "monthlyCost": 180,
@@ -716,8 +791,8 @@
       },
       "id": "catalog",
       "position": {
-        "x": 1920,
-        "y": 0
+        "x": 1620,
+        "y": 280
       },
       "type": "architecture"
     },
@@ -731,7 +806,7 @@
         "description": "ORQUESTRAÇÃO | Slides 3–4, 11–12, 15, 17, 19, 21. Três instâncias sem sessão local. Autenticação e autorização por pedido antes do domínio. Estoque final e confirmação de compra usam a fonte de verdade; dados exibidos em cache/réplica podem atrasar. Evitar pedido/cobrança duplicados. Timeout, retry e circuit breaker contêm falhas; pagamento externo exige confirmação/reconciliação. Detalhes de idempotência e outbox ficam nas notas de apoio.",
         "instances": 3,
         "kind": "service",
-        "label": "06 Checkout",
+        "label": "API de checkout",
         "latency": 10,
         "memory": 30,
         "monthlyCost": 220,
@@ -759,33 +834,8 @@
       },
       "id": "checkout",
       "position": {
-        "x": 2320,
-        "y": 0
-      },
-      "type": "architecture"
-    },
-    {
-      "data": {
-        "availability": 99.95,
-        "capacity": 40000,
-        "cpu": 30,
-        "currentLoad": 8000,
-        "deployment": {},
-        "description": "ENTRADA | Slides 15, 19. Alternativas do slide: Auth0, Keycloak, Cognito. As APIs conferem identidade e autorização antes do domínio. Catálogo público pode ser anônimo; recursos privados exigem permissão. Token válido não autoriza ler o pedido de outro cliente. Relações representam configuração/validação de identidade; não implicam chamada ao provedor em cada request.",
-        "instances": 2,
-        "kind": "service",
-        "label": "07 Identidade",
-        "latency": 10,
-        "memory": 30,
-        "monthlyCost": 0,
-        "replicas": 2,
-        "storage": 8,
-        "technology": "OAuth2/OIDC / Keycloak"
-      },
-      "id": "identity",
-      "position": {
-        "x": 2720,
-        "y": 0
+        "x": 1620,
+        "y": 690
       },
       "type": "architecture"
     },
@@ -799,7 +849,7 @@
         "description": "DADOS | Slides 9, 16–17, 19. Memória rápida para consultas repetidas de catálogo, produto e busca; HIT evita SQL, MISS usa uma réplica. Nunca cachear pagamento ou documento; informação pessoal requer TTL curto, conforme o slide 16. TTL/invalidação são políticas a definir; nenhum valor em segundos é fixado pelos slides. Cache é reconstruível, não fonte de verdade para compra. Falha pede fallback com limite de carga.",
         "instances": 2,
         "kind": "cache",
-        "label": "08 Cache",
+        "label": "Cache de catálogo",
         "latency": 10,
         "memory": 30,
         "monthlyCost": 160,
@@ -809,8 +859,8 @@
       },
       "id": "redis",
       "position": {
-        "x": 3280,
-        "y": 0
+        "x": 2050,
+        "y": 110
       },
       "type": "architecture"
     },
@@ -824,7 +874,7 @@
         "description": "DADOS | Slides 11, 17, 19. Fonte da verdade para checkout, pagamento confirmado e estoque final. Uma escrita autoritativa; réplicas de leitura recebem propagação e podem atrasar. Criptografia em repouso e credenciais de menor privilégio. PostgreSQL, MySQL e SQL Server são alternativas do slide; o schema de oito tabelas é aprofundamento do nosso exemplo, não requisito imposto pela palestra. Standby/backup complementam HA; validar recuperação.",
         "instances": 2,
         "kind": "database",
-        "label": "09 Writer",
+        "label": "Banco de escrita",
         "latency": 10,
         "memory": 30,
         "monthlyCost": 400,
@@ -1315,8 +1365,8 @@
       },
       "id": "primary",
       "position": {
-        "x": 3840,
-        "y": 0
+        "x": 2050,
+        "y": 690
       },
       "type": "architecture"
     },
@@ -1330,7 +1380,7 @@
         "description": "DADOS | Slides 11, 17–18. Réplica próxima da aplicação na região principal. Catálogo/busca em MISS podem usar um destino saudável; réplicas A/B são alternativas, não duas leituras obrigatórias da mesma consulta. Monitorar atraso; nenhum checkout decide estoque por dado atrasado. Separação de leitura e escrita acompanha o perfil 95/5 do caso.",
         "instances": 1,
         "kind": "database",
-        "label": "10 Leitura A",
+        "label": "Réplica A",
         "latency": 10,
         "memory": 30,
         "monthlyCost": 180,
@@ -1340,8 +1390,8 @@
       },
       "id": "read1",
       "position": {
-        "x": 4240,
-        "y": 0
+        "x": 2460,
+        "y": 110
       },
       "type": "architecture"
     },
@@ -1355,7 +1405,7 @@
         "description": "DADOS | Slides 11, 17–18. Segunda réplica de leitura, usada para ilustrar proximidade regional. Exemplo da palestra: leitura do cliente europeu em 40 ms, comparada a 220 ms cruzando o Atlântico. São valores do exemplo dos slides, não latências medidas nesta preparação. A réplica pode atrasar; não vira outro writer automaticamente. Escolha do destino respeita região e política de dados.",
         "instances": 1,
         "kind": "database",
-        "label": "11 Leitura B",
+        "label": "Réplica B",
         "latency": 10,
         "memory": 30,
         "monthlyCost": 180,
@@ -1365,8 +1415,8 @@
       },
       "id": "read2",
       "position": {
-        "x": 4640,
-        "y": 0
+        "x": 2460,
+        "y": 390
       },
       "type": "architecture"
     },
@@ -1380,7 +1430,7 @@
         "description": "DADOS | Slides 18–19. Recebe trabalho que não exige resposta imediata; absorve pico e desacopla workers. Exemplo: 50 mil mensagens por hora na Black Friday. Payload só com o necessário, sem segredos em texto puro. As opções são alternativas de tecnologia, não três filas simultâneas. Publicação pós-compra é uma relação lógica; o mecanismo transacional/outbox e a DLQ estão preservados no aprofundamento anterior.",
         "instances": 2,
         "kind": "queue",
-        "label": "12 Fila",
+        "label": "Fila assíncrona",
         "latency": 10,
         "memory": 30,
         "monthlyCost": 120,
@@ -1390,8 +1440,8 @@
       },
       "id": "queue",
       "position": {
-        "x": 5200,
-        "y": 0
+        "x": 2050,
+        "y": 1120
       },
       "type": "architecture"
     },
@@ -1405,7 +1455,7 @@
         "description": "ORQUESTRAÇÃO | Slides 18–19. Processa e-mail e baixa operacional de estoque fora da resposta imediata. A decisão de vender/reservar estoque permanece no checkout e writer (slides 4, 11, 17); a etapa posterior não permite venda sem saldo. Exemplo do slide 18: 50 mil mensagens/hora; workers de 3 para 20. Escala por backlog/idade, com teto e alarme (slide 21). Mensagem mínima, sem segredos; tratar repetições com idempotência.",
         "instances": 3,
         "kind": "service",
-        "label": "13 Worker",
+        "label": "Notificações",
         "latency": 10,
         "memory": 30,
         "monthlyCost": 100,
@@ -1433,83 +1483,8 @@
       },
       "id": "worker",
       "position": {
-        "x": 5600,
-        "y": 0
-      },
-      "type": "architecture"
-    },
-    {
-      "data": {
-        "availability": 99.95,
-        "capacity": 200000,
-        "cpu": 30,
-        "currentLoad": 12000,
-        "deployment": {},
-        "description": "OBSERVABILIDADE | Slides 6–7, 18–20, 22–23. Latência P95, throughput, erros, saturação de gateway/app/cache/banco e backlog orientam o investimento e o rollback. Exemplo do slide 18: painel mostra latência subindo 3 minutos antes do primeiro erro. Essa antecipação é ilustrativa, não garantia. Disponibilidade-alvo tem custo; números cadastrados no Build Arch são parâmetros de modelo, não SLO comprovado. Slide 7, indisponibilidade anual aproximada: 99% = 3,65 dias; 99,9% = 8,8 h; 99,99% = 52 min; 99,999% = 5 min.",
-        "instances": 2,
-        "kind": "service",
-        "label": "14 Métricas",
-        "latency": 10,
-        "memory": 30,
-        "monthlyCost": 150,
-        "replicas": 2,
-        "storage": 8,
-        "technology": "Grafana / Datadog"
-      },
-      "id": "metrics",
-      "position": {
-        "x": 6160,
-        "y": 0
-      },
-      "type": "architecture"
-    },
-    {
-      "data": {
-        "availability": 99.95,
-        "capacity": 200000,
-        "cpu": 30,
-        "currentLoad": 12000,
-        "deployment": {},
-        "description": "OBSERVABILIDADE | Slides 18–19. Centraliza registros de instâncias e regiões para investigar incidentes. Nunca registrar senha, cartão ou dado pessoal sem mascarar. Correlacionar pedido/requisição quando aplicável e controlar acesso/retenção. Observabilidade deve mostrar onde o gargalo e a falha aparecem, sem expor informação sensível.",
-        "instances": 2,
-        "kind": "service",
-        "label": "15 Logs",
-        "latency": 10,
-        "memory": 30,
-        "monthlyCost": 0,
-        "replicas": 2,
-        "storage": 8,
-        "technology": "Elastic / Loki"
-      },
-      "id": "logs",
-      "position": {
-        "x": 6560,
-        "y": 0
-      },
-      "type": "architecture"
-    },
-    {
-      "data": {
-        "availability": 99.95,
-        "capacity": 200000,
-        "cpu": 30,
-        "currentLoad": 12000,
-        "deployment": {},
-        "description": "OBSERVABILIDADE | Slide 18. Acompanha a requisição entre componentes para distinguir tempo de rede, aplicação e dependências. Complementa métricas e logs; não substitui os dois. Telemetria ocorre em um plano de operação separado do fluxo de compra. Propagação de contexto e mascaramento de dados devem ser definidos.",
-        "instances": 2,
-        "kind": "service",
-        "label": "16 Tracing",
-        "latency": 10,
-        "memory": 30,
-        "monthlyCost": 0,
-        "replicas": 2,
-        "storage": 8,
-        "technology": "Tracing entre instâncias"
-      },
-      "id": "tracing",
-      "position": {
-        "x": 6960,
-        "y": 0
+        "x": 2460,
+        "y": 1120
       },
       "type": "architecture"
     },
@@ -1523,7 +1498,7 @@
         "description": "MULTI-REGIÃO | Slide 18. Uma cópia próxima atende clientes em outro continente; outra região pode assumir quando a principal cai. DNS geográfico, CDN global, aplicação regional e réplica regional participam do desenho. Política de residência de dados faz parte da decisão. O slide não fixa RPO/RTO nem declara escrita active-active: promoção, capacidade disponível, roteamento e consistência precisam ser planejados e ensaiados.",
         "instances": 2,
         "kind": "cloud",
-        "label": "17 Região",
+        "label": "Região secundária",
         "latency": 10,
         "memory": 30,
         "monthlyCost": 300,
@@ -1533,8 +1508,8 @@
       },
       "id": "region",
       "position": {
-        "x": 7520,
-        "y": 0
+        "x": 2460,
+        "y": 780
       },
       "type": "architecture"
     },
@@ -1545,21 +1520,21 @@
         "cpu": 30,
         "currentLoad": 12000,
         "deployment": {},
-        "description": "BORDA | Slide 19. Proteção contra tráfego malicioso e ataques volumétricos antes da aplicação. Regras e bloqueios complementam o rate limiting da entrada. Autenticação e autorização continuam nas APIs; WAF não conhece todas as regras do domínio. Sem acesso público direto a banco, cache ou fila. Provedor não definido no material.",
+        "description": "OBSERVABILIDADE | Slides 6–7, 18–20, 22–23. Latência P95, throughput, erros, saturação de gateway/app/cache/banco e backlog orientam o investimento e o rollback. Exemplo do slide 18: painel mostra latência subindo 3 minutos antes do primeiro erro. Essa antecipação é ilustrativa, não garantia. Disponibilidade-alvo tem custo; números cadastrados no Build Arch são parâmetros de modelo, não SLO comprovado. Slide 7, indisponibilidade anual aproximada: 99% = 3,65 dias; 99,9% = 8,8 h; 99,99% = 52 min; 99,999% = 5 min.",
         "instances": 2,
-        "kind": "gateway",
-        "label": "18 WAF",
+        "kind": "service",
+        "label": "Métricas / painel",
         "latency": 10,
         "memory": 30,
-        "monthlyCost": 0,
+        "monthlyCost": 150,
         "replicas": 2,
         "storage": 8,
-        "technology": "WAF / proteção DDoS"
+        "technology": "Grafana / Datadog"
       },
-      "id": "waf",
+      "id": "metrics",
       "position": {
-        "x": 8080,
-        "y": 0
+        "x": 2940,
+        "y": 200
       },
       "type": "architecture"
     },
@@ -1570,21 +1545,21 @@
         "cpu": 30,
         "currentLoad": 12000,
         "deployment": {},
-        "description": "ORQUESTRAÇÃO | Slide 19. Ambiente de containers que executa catálogo, checkout e notificações; relações de controle, sem tráfego de clientes pelo scheduler. Distribuição de instâncias e recuperação de unidades falhas sustentam a escala horizontal. Configuração de recursos e health checks é proposta didática. A escolha exata da plataforma depende do provedor e da equipe; não fixa um serviço cloud para o caso. Slide 24: AWS, GCP, Azure e Alibaba Cloud; comparar compute, storage, egress e CDN, incluindo operação própria versus gerenciada, sem preços fixos.",
+        "description": "OBSERVABILIDADE | Slides 18–19. Centraliza registros de instâncias e regiões para investigar incidentes. Nunca registrar senha, cartão ou dado pessoal sem mascarar. Correlacionar pedido/requisição quando aplicável e controlar acesso/retenção. Observabilidade deve mostrar onde o gargalo e a falha aparecem, sem expor informação sensível.",
         "instances": 2,
-        "kind": "kubernetes",
-        "label": "19 Containers",
+        "kind": "service",
+        "label": "Logs centralizados",
         "latency": 10,
         "memory": 30,
         "monthlyCost": 0,
         "replicas": 2,
         "storage": 8,
-        "technology": "Kubernetes ou equivalente"
+        "technology": "Elastic / Loki"
       },
-      "id": "orchestrator",
+      "id": "logs",
       "position": {
-        "x": 8480,
-        "y": 0
+        "x": 2940,
+        "y": 600
       },
       "type": "architecture"
     },
@@ -1595,21 +1570,21 @@
         "cpu": 30,
         "currentLoad": 12000,
         "deployment": {},
-        "description": "ORQUESTRAÇÃO | Slides 18–19, 21. Ajusta réplicas por CPU nos apps e tamanho/idade da fila nos workers. O exemplo dos slides cresce de 3 para 20 workers; o máximo 20 é referência deste exercício. Há limite conhecido e alarme para decisão humana. Autoscaling de API não remove gargalo compartilhado no banco (slide 23). Serviços e métricas precisam de implementação real.",
+        "description": "OBSERVABILIDADE | Slide 18. Acompanha a requisição entre componentes para distinguir tempo de rede, aplicação e dependências. Complementa métricas e logs; não substitui os dois. Telemetria ocorre em um plano de operação separado do fluxo de compra. Propagação de contexto e mascaramento de dados devem ser definidos.",
         "instances": 2,
-        "kind": "kubernetes",
-        "label": "20 Autoscaler",
+        "kind": "service",
+        "label": "Tracing distribuído",
         "latency": 10,
         "memory": 30,
         "monthlyCost": 0,
         "replicas": 2,
         "storage": 8,
-        "technology": "CPU / backlog / teto"
+        "technology": "Tracing entre instâncias"
       },
-      "id": "autoscaler",
+      "id": "tracing",
       "position": {
-        "x": 8880,
-        "y": 0
+        "x": 2940,
+        "y": 1000
       },
       "type": "architecture"
     },
@@ -1623,7 +1598,7 @@
         "description": "ENTREGA | Slide 19. Análise estática de código executada em cada pull request, integrada ao fluxo de qualidade antes do deploy. Complementa testes, revisão e monitoramento; não comprova comportamento de produção sozinha. Resultado alimenta o CI/CD, sem participar da jornada HTTP do cliente.",
         "instances": 2,
         "kind": "service",
-        "label": "21 Análise PR",
+        "label": "Análise estática",
         "latency": 10,
         "memory": 30,
         "monthlyCost": 0,
@@ -1633,8 +1608,8 @@
       },
       "id": "staticanalysis",
       "position": {
-        "x": 9440,
-        "y": 0
+        "x": 800,
+        "y": 1560
       },
       "type": "architecture"
     },
@@ -1648,7 +1623,7 @@
         "description": "ENTREGA | Slides 19–20, 25. Build, testes e deploy gradual. Versão nova recebe uma fração do tráfego ou uma região; métricas determinam expansão ou retorno à anterior. Rollback limita o alcance do erro. Artefato versionado, credenciais por ambiente e compatibilidade de dados sustentam o caminho de volta. Relação de entrega/control plane, não chamada feita por um cliente.",
         "instances": 2,
         "kind": "service",
-        "label": "22 Canary",
+        "label": "CI/CD e rollback",
         "latency": 10,
         "memory": 30,
         "monthlyCost": 0,
@@ -1658,8 +1633,8 @@
       },
       "id": "delivery",
       "position": {
-        "x": 9840,
-        "y": 0
+        "x": 1200,
+        "y": 1560
       },
       "type": "architecture"
     },
@@ -1670,21 +1645,46 @@
         "cpu": 30,
         "currentLoad": 12000,
         "deployment": {},
-        "description": "ENTRADA | Slide 21. Em pico extremo, uma fila de acesso controla quantos clientes entram por vez. É uma política da entrada, ativada quando necessária; não é a fila de tarefas pós-compra. Rate limiting, espera e capacidade planejada trabalham juntos. Esta relação mostra controle de admissão, não uma dependência obrigatória em toda navegação.",
+        "description": "ORQUESTRAÇÃO | Slide 19. Ambiente de containers que executa catálogo, checkout e notificações; relações de controle, sem tráfego de clientes pelo scheduler. Distribuição de instâncias e recuperação de unidades falhas sustentam a escala horizontal. Configuração de recursos e health checks é proposta didática. A escolha exata da plataforma depende do provedor e da equipe; não fixa um serviço cloud para o caso. Slide 24: AWS, GCP, Azure e Alibaba Cloud; comparar compute, storage, egress e CDN, incluindo operação própria versus gerenciada, sem preços fixos.",
         "instances": 2,
-        "kind": "gateway",
-        "label": "23 Espera",
+        "kind": "kubernetes",
+        "label": "Containers",
         "latency": 10,
         "memory": 30,
         "monthlyCost": 0,
         "replicas": 2,
         "storage": 8,
-        "technology": "Controle de admissão"
+        "technology": "Kubernetes ou equivalente"
       },
-      "id": "waiting",
+      "id": "orchestrator",
       "position": {
-        "x": 10400,
-        "y": 0
+        "x": 1620,
+        "y": 1560
+      },
+      "type": "architecture"
+    },
+    {
+      "data": {
+        "availability": 99.95,
+        "capacity": 200000,
+        "cpu": 30,
+        "currentLoad": 12000,
+        "deployment": {},
+        "description": "ORQUESTRAÇÃO | Slides 18–19, 21. Ajusta réplicas por CPU nos apps e tamanho/idade da fila nos workers. O exemplo dos slides cresce de 3 para 20 workers; o máximo 20 é referência deste exercício. Há limite conhecido e alarme para decisão humana. Autoscaling de API não remove gargalo compartilhado no banco (slide 23). Serviços e métricas precisam de implementação real.",
+        "instances": 2,
+        "kind": "kubernetes",
+        "label": "Autoscaler",
+        "latency": 10,
+        "memory": 30,
+        "monthlyCost": 0,
+        "replicas": 2,
+        "storage": 8,
+        "technology": "CPU / backlog / teto"
+      },
+      "id": "autoscaler",
+      "position": {
+        "x": 2050,
+        "y": 1560
       },
       "type": "architecture"
     }
@@ -15906,14 +15906,583 @@
       "version": 19
     },
     {
+      "createdAt": "2026-10-07T14:39:42.111Z",
+      "edges": [
+        {
+          "animated": false,
+          "data": {
+            "asynchronous": false,
+            "evidence": "PPT e PDF, slides 13, 18. Plano de controle; relação lógica manual. Latência cadastrada é parâmetro ilustrativo, sem benchmark.",
+            "inferred": false,
+            "latency": 0,
+            "protocol": "Resolver domínio"
+          },
+          "id": "users-dns",
+          "source": "users",
+          "target": "dns",
+          "type": "smoothstep"
+        },
+        {
+          "animated": false,
+          "data": {
+            "asynchronous": false,
+            "evidence": "PPT e PDF, slides 19. Plano de dados; relação lógica manual. Latência cadastrada é parâmetro ilustrativo, sem benchmark.",
+            "inferred": false,
+            "latency": 10,
+            "protocol": "HTTPS público"
+          },
+          "id": "users-waf",
+          "source": "users",
+          "target": "waf",
+          "type": "smoothstep"
+        },
+        {
+          "animated": false,
+          "data": {
+            "asynchronous": false,
+            "evidence": "PPT e PDF, slides 19. Plano de dados; relação lógica manual. Latência cadastrada é parâmetro ilustrativo, sem benchmark.",
+            "inferred": false,
+            "latency": 10,
+            "protocol": "Proteção de borda"
+          },
+          "id": "waf-cdn",
+          "source": "waf",
+          "target": "cdn",
+          "type": "smoothstep"
+        },
+        {
+          "animated": false,
+          "data": {
+            "asynchronous": false,
+            "evidence": "PPT e PDF, slides 14, 19. Plano de dados; relação lógica manual. Latência cadastrada é parâmetro ilustrativo, sem benchmark.",
+            "inferred": false,
+            "latency": 10,
+            "protocol": "Dinâmico / HTTPS"
+          },
+          "id": "cdn-lb",
+          "source": "cdn",
+          "target": "lb",
+          "type": "smoothstep"
+        },
+        {
+          "animated": false,
+          "data": {
+            "asynchronous": false,
+            "evidence": "PPT e PDF, slides 15, 19. Plano de dados; relação lógica manual. Latência cadastrada é parâmetro ilustrativo, sem benchmark.",
+            "inferred": false,
+            "latency": 10,
+            "protocol": "Balancear consultas"
+          },
+          "id": "lb-catalog",
+          "source": "lb",
+          "target": "catalog",
+          "type": "smoothstep"
+        },
+        {
+          "animated": false,
+          "data": {
+            "asynchronous": false,
+            "evidence": "PPT e PDF, slides 15, 19. Plano de dados; relação lógica manual. Latência cadastrada é parâmetro ilustrativo, sem benchmark.",
+            "inferred": false,
+            "latency": 10,
+            "protocol": "Balancear compras"
+          },
+          "id": "lb-checkout",
+          "source": "lb",
+          "target": "checkout",
+          "type": "smoothstep"
+        },
+        {
+          "animated": false,
+          "data": {
+            "asynchronous": false,
+            "evidence": "PPT e PDF, slides 21. Plano de controle; relação lógica manual. Latência cadastrada é parâmetro ilustrativo, sem benchmark.",
+            "inferred": false,
+            "latency": 0,
+            "protocol": "Admissão em pico"
+          },
+          "id": "lb-waiting",
+          "source": "lb",
+          "target": "waiting",
+          "type": "smoothstep"
+        },
+        {
+          "animated": false,
+          "data": {
+            "asynchronous": false,
+            "evidence": "PPT e PDF, slides 15, 19. Plano de controle; relação lógica manual. Latência cadastrada é parâmetro ilustrativo, sem benchmark.",
+            "inferred": false,
+            "latency": 0,
+            "protocol": "Autenticar / autorizar"
+          },
+          "id": "identity-catalog",
+          "source": "identity",
+          "target": "catalog",
+          "type": "smoothstep"
+        },
+        {
+          "animated": false,
+          "data": {
+            "asynchronous": false,
+            "evidence": "PPT e PDF, slides 15, 19. Plano de controle; relação lógica manual. Latência cadastrada é parâmetro ilustrativo, sem benchmark.",
+            "inferred": false,
+            "latency": 0,
+            "protocol": "Autenticar / autorizar"
+          },
+          "id": "identity-checkout",
+          "source": "identity",
+          "target": "checkout",
+          "type": "smoothstep"
+        },
+        {
+          "animated": false,
+          "data": {
+            "asynchronous": false,
+            "evidence": "PPT e PDF, slides 16, 19. Plano de dados; relação lógica manual. Latência cadastrada é parâmetro ilustrativo, sem benchmark.",
+            "inferred": false,
+            "latency": 10,
+            "protocol": "HIT / MISS"
+          },
+          "id": "catalog-redis",
+          "source": "catalog",
+          "target": "redis",
+          "type": "smoothstep"
+        },
+        {
+          "animated": false,
+          "data": {
+            "asynchronous": false,
+            "evidence": "PPT e PDF, slides 17. Plano de dados; relação lógica manual. Latência cadastrada é parâmetro ilustrativo, sem benchmark.",
+            "inferred": false,
+            "latency": 10,
+            "protocol": "SQL em MISS / A"
+          },
+          "id": "catalog-read1",
+          "source": "catalog",
+          "target": "read1",
+          "type": "smoothstep"
+        },
+        {
+          "animated": false,
+          "data": {
+            "asynchronous": false,
+            "evidence": "PPT e PDF, slides 17, 18. Plano de dados; relação lógica manual. Latência cadastrada é parâmetro ilustrativo, sem benchmark.",
+            "inferred": false,
+            "latency": 10,
+            "protocol": "SQL em MISS / B"
+          },
+          "id": "catalog-read2",
+          "source": "catalog",
+          "target": "read2",
+          "type": "smoothstep"
+        },
+        {
+          "animated": false,
+          "data": {
+            "asynchronous": false,
+            "evidence": "PPT e PDF, slides 11, 17. Plano de dados; relação lógica manual. Latência cadastrada é parâmetro ilustrativo, sem benchmark.",
+            "inferred": false,
+            "latency": 10,
+            "protocol": "Compra autoritativa"
+          },
+          "id": "checkout-primary",
+          "source": "checkout",
+          "target": "primary",
+          "type": "smoothstep"
+        },
+        {
+          "animated": true,
+          "data": {
+            "asynchronous": true,
+            "evidence": "PPT e PDF, slides 17. Plano de replicação; relação lógica manual. Latência cadastrada é parâmetro ilustrativo, sem benchmark.",
+            "inferred": false,
+            "latency": 0,
+            "protocol": "Replicar leitura"
+          },
+          "id": "primary-read1",
+          "source": "primary",
+          "target": "read1",
+          "type": "smoothstep"
+        },
+        {
+          "animated": true,
+          "data": {
+            "asynchronous": true,
+            "evidence": "PPT e PDF, slides 17, 18. Plano de replicação; relação lógica manual. Latência cadastrada é parâmetro ilustrativo, sem benchmark.",
+            "inferred": false,
+            "latency": 0,
+            "protocol": "Replicar leitura regional"
+          },
+          "id": "primary-read2",
+          "source": "primary",
+          "target": "read2",
+          "type": "smoothstep"
+        },
+        {
+          "animated": true,
+          "data": {
+            "asynchronous": true,
+            "evidence": "PPT e PDF, slides 18, 19. Plano de dados; relação lógica manual. Latência cadastrada é parâmetro ilustrativo, sem benchmark.",
+            "inferred": false,
+            "latency": 10,
+            "protocol": "Trabalho pós-compra"
+          },
+          "id": "checkout-queue",
+          "source": "checkout",
+          "target": "queue",
+          "type": "smoothstep"
+        },
+        {
+          "animated": true,
+          "data": {
+            "asynchronous": true,
+            "evidence": "PPT e PDF, slides 18, 19. Plano de dados; relação lógica manual. Latência cadastrada é parâmetro ilustrativo, sem benchmark.",
+            "inferred": false,
+            "latency": 10,
+            "protocol": "Consumir / ACK"
+          },
+          "id": "queue-worker",
+          "source": "queue",
+          "target": "worker",
+          "type": "smoothstep"
+        },
+        {
+          "animated": true,
+          "data": {
+            "asynchronous": true,
+            "evidence": "PPT e PDF, slides 18. Plano de dados; relação lógica manual. Latência cadastrada é parâmetro ilustrativo, sem benchmark.",
+            "inferred": false,
+            "latency": 10,
+            "protocol": "Baixa após reserva"
+          },
+          "id": "worker-primary",
+          "source": "worker",
+          "target": "primary",
+          "type": "smoothstep"
+        },
+        {
+          "animated": false,
+          "data": {
+            "asynchronous": false,
+            "evidence": "PPT e PDF, slides 18. Plano de controle; relação lógica manual. Latência cadastrada é parâmetro ilustrativo, sem benchmark.",
+            "inferred": false,
+            "latency": 0,
+            "protocol": "Roteamento / failover"
+          },
+          "id": "dns-region",
+          "source": "dns",
+          "target": "region",
+          "type": "smoothstep"
+        },
+        {
+          "animated": true,
+          "data": {
+            "asynchronous": true,
+            "evidence": "PPT e PDF, slides 18. Plano de replicação; relação lógica manual. Latência cadastrada é parâmetro ilustrativo, sem benchmark.",
+            "inferred": false,
+            "latency": 0,
+            "protocol": "Continuidade de dados"
+          },
+          "id": "primary-region",
+          "source": "primary",
+          "target": "region",
+          "type": "smoothstep"
+        },
+        {
+          "animated": false,
+          "data": {
+            "asynchronous": false,
+            "evidence": "PPT e PDF, slides 18. Plano de controle; relação lógica manual. Latência cadastrada é parâmetro ilustrativo, sem benchmark.",
+            "inferred": false,
+            "latency": 0,
+            "protocol": "Leitura próxima"
+          },
+          "id": "region-read2",
+          "source": "region",
+          "target": "read2",
+          "type": "smoothstep"
+        },
+        {
+          "animated": false,
+          "data": {
+            "asynchronous": false,
+            "evidence": "PPT e PDF, slides 19, 21. Plano de controle; relação lógica manual. Latência cadastrada é parâmetro ilustrativo, sem benchmark.",
+            "inferred": false,
+            "latency": 0,
+            "protocol": "Ajustar réplicas / teto"
+          },
+          "id": "autoscaler-orchestrator",
+          "source": "autoscaler",
+          "target": "orchestrator",
+          "type": "smoothstep"
+        },
+        {
+          "animated": false,
+          "data": {
+            "asynchronous": false,
+            "evidence": "PPT e PDF, slides 18, 19. Plano de controle; relação lógica manual. Latência cadastrada é parâmetro ilustrativo, sem benchmark.",
+            "inferred": false,
+            "latency": 0,
+            "protocol": "Backlog / idade"
+          },
+          "id": "queue-autoscaler",
+          "source": "queue",
+          "target": "autoscaler",
+          "type": "smoothstep"
+        },
+        {
+          "animated": false,
+          "data": {
+            "asynchronous": false,
+            "evidence": "PPT e PDF, slides 19, 21. Plano de controle; relação lógica manual. Latência cadastrada é parâmetro ilustrativo, sem benchmark.",
+            "inferred": false,
+            "latency": 0,
+            "protocol": "CPU / alarme"
+          },
+          "id": "metrics-autoscaler",
+          "source": "metrics",
+          "target": "autoscaler",
+          "type": "smoothstep"
+        },
+        {
+          "animated": false,
+          "data": {
+            "asynchronous": false,
+            "evidence": "PPT e PDF, slides 19. Plano de controle; relação lógica manual. Latência cadastrada é parâmetro ilustrativo, sem benchmark.",
+            "inferred": false,
+            "latency": 0,
+            "protocol": "Executar containers"
+          },
+          "id": "orchestrator-catalog",
+          "source": "orchestrator",
+          "target": "catalog",
+          "type": "smoothstep"
+        },
+        {
+          "animated": false,
+          "data": {
+            "asynchronous": false,
+            "evidence": "PPT e PDF, slides 19. Plano de controle; relação lógica manual. Latência cadastrada é parâmetro ilustrativo, sem benchmark.",
+            "inferred": false,
+            "latency": 0,
+            "protocol": "Executar containers"
+          },
+          "id": "orchestrator-checkout",
+          "source": "orchestrator",
+          "target": "checkout",
+          "type": "smoothstep"
+        },
+        {
+          "animated": false,
+          "data": {
+            "asynchronous": false,
+            "evidence": "PPT e PDF, slides 19. Plano de controle; relação lógica manual. Latência cadastrada é parâmetro ilustrativo, sem benchmark.",
+            "inferred": false,
+            "latency": 0,
+            "protocol": "Executar workers"
+          },
+          "id": "orchestrator-worker",
+          "source": "orchestrator",
+          "target": "worker",
+          "type": "smoothstep"
+        },
+        {
+          "animated": false,
+          "data": {
+            "asynchronous": false,
+            "evidence": "PPT e PDF, slides 19. Plano de entrega; relação lógica manual. Latência cadastrada é parâmetro ilustrativo, sem benchmark.",
+            "inferred": false,
+            "latency": 0,
+            "protocol": "Qualidade em cada PR"
+          },
+          "id": "staticanalysis-delivery",
+          "source": "staticanalysis",
+          "target": "delivery",
+          "type": "smoothstep"
+        },
+        {
+          "animated": false,
+          "data": {
+            "asynchronous": false,
+            "evidence": "PPT e PDF, slides 19, 20. Plano de entrega; relação lógica manual. Latência cadastrada é parâmetro ilustrativo, sem benchmark.",
+            "inferred": false,
+            "latency": 0,
+            "protocol": "Canary / rollback"
+          },
+          "id": "delivery-orchestrator",
+          "source": "delivery",
+          "target": "orchestrator",
+          "type": "smoothstep"
+        },
+        {
+          "animated": false,
+          "data": {
+            "asynchronous": false,
+            "evidence": "PPT e PDF, slides 20. Plano de controle; relação lógica manual. Latência cadastrada é parâmetro ilustrativo, sem benchmark.",
+            "inferred": false,
+            "latency": 0,
+            "protocol": "Decidir pelo monitoramento"
+          },
+          "id": "metrics-delivery",
+          "source": "metrics",
+          "target": "delivery",
+          "type": "smoothstep"
+        },
+        {
+          "animated": true,
+          "data": {
+            "asynchronous": true,
+            "evidence": "PPT e PDF, slides 18, 19. Plano de operação; relação lógica manual. Latência cadastrada é parâmetro ilustrativo, sem benchmark.",
+            "inferred": false,
+            "latency": 0,
+            "protocol": "Telemetria: metrics"
+          },
+          "id": "catalog-metrics",
+          "source": "catalog",
+          "target": "metrics",
+          "type": "smoothstep"
+        },
+        {
+          "animated": true,
+          "data": {
+            "asynchronous": true,
+            "evidence": "PPT e PDF, slides 18, 19. Plano de operação; relação lógica manual. Latência cadastrada é parâmetro ilustrativo, sem benchmark.",
+            "inferred": false,
+            "latency": 0,
+            "protocol": "Telemetria: logs"
+          },
+          "id": "catalog-logs",
+          "source": "catalog",
+          "target": "logs",
+          "type": "smoothstep"
+        },
+        {
+          "animated": true,
+          "data": {
+            "asynchronous": true,
+            "evidence": "PPT e PDF, slides 18, 19. Plano de operação; relação lógica manual. Latência cadastrada é parâmetro ilustrativo, sem benchmark.",
+            "inferred": false,
+            "latency": 0,
+            "protocol": "Telemetria: tracing"
+          },
+          "id": "catalog-tracing",
+          "source": "catalog",
+          "target": "tracing",
+          "type": "smoothstep"
+        },
+        {
+          "animated": true,
+          "data": {
+            "asynchronous": true,
+            "evidence": "PPT e PDF, slides 18, 19. Plano de operação; relação lógica manual. Latência cadastrada é parâmetro ilustrativo, sem benchmark.",
+            "inferred": false,
+            "latency": 0,
+            "protocol": "Telemetria: metrics"
+          },
+          "id": "checkout-metrics",
+          "source": "checkout",
+          "target": "metrics",
+          "type": "smoothstep"
+        },
+        {
+          "animated": true,
+          "data": {
+            "asynchronous": true,
+            "evidence": "PPT e PDF, slides 18, 19. Plano de operação; relação lógica manual. Latência cadastrada é parâmetro ilustrativo, sem benchmark.",
+            "inferred": false,
+            "latency": 0,
+            "protocol": "Telemetria: logs"
+          },
+          "id": "checkout-logs",
+          "source": "checkout",
+          "target": "logs",
+          "type": "smoothstep"
+        },
+        {
+          "animated": true,
+          "data": {
+            "asynchronous": true,
+            "evidence": "PPT e PDF, slides 18, 19. Plano de operação; relação lógica manual. Latência cadastrada é parâmetro ilustrativo, sem benchmark.",
+            "inferred": false,
+            "latency": 0,
+            "protocol": "Telemetria: tracing"
+          },
+          "id": "checkout-tracing",
+          "source": "checkout",
+          "target": "tracing",
+          "type": "smoothstep"
+        },
+        {
+          "animated": true,
+          "data": {
+            "asynchronous": true,
+            "evidence": "PPT e PDF, slides 18, 19. Plano de operação; relação lógica manual. Latência cadastrada é parâmetro ilustrativo, sem benchmark.",
+            "inferred": false,
+            "latency": 0,
+            "protocol": "Telemetria: metrics"
+          },
+          "id": "worker-metrics",
+          "source": "worker",
+          "target": "metrics",
+          "type": "smoothstep"
+        },
+        {
+          "animated": true,
+          "data": {
+            "asynchronous": true,
+            "evidence": "PPT e PDF, slides 18, 19. Plano de operação; relação lógica manual. Latência cadastrada é parâmetro ilustrativo, sem benchmark.",
+            "inferred": false,
+            "latency": 0,
+            "protocol": "Telemetria: logs"
+          },
+          "id": "worker-logs",
+          "source": "worker",
+          "target": "logs",
+          "type": "smoothstep"
+        },
+        {
+          "animated": true,
+          "data": {
+            "asynchronous": true,
+            "evidence": "PPT e PDF, slides 18, 19. Plano de operação; relação lógica manual. Latência cadastrada é parâmetro ilustrativo, sem benchmark.",
+            "inferred": false,
+            "latency": 0,
+            "protocol": "Telemetria: tracing"
+          },
+          "id": "worker-tracing",
+          "source": "worker",
+          "target": "tracing",
+          "type": "smoothstep"
+        },
+        {
+          "animated": false,
+          "data": {
+            "asynchronous": false,
+            "evidence": "PPT e PDF, slides 18, 19. Plano de controle; relação lógica manual. Latência cadastrada é parâmetro ilustrativo, sem benchmark.",
+            "inferred": false,
+            "latency": 0,
+            "protocol": "Aplicação regional"
+          },
+          "id": "region-orchestrator",
+          "source": "region",
+          "target": "orchestrator",
+          "type": "smoothstep"
+        }
+      ],
       "id": "apresentacao-linear-v20",
-      "version": 20,
+      "infrastructure": {
+        "bandwidthMbps": 1000,
+        "cpuPerHost": 4,
+        "demand": 20000,
+        "failedHosts": 0,
+        "hosts": 4,
+        "latencyMs": 10,
+        "memoryPerHost": 8192,
+        "packetLoss": 0,
+        "payloadKB": 32,
+        "workloadScope": "Recursos ilustrativos dos containers de catálogo, checkout e notificações (slide 19). CPU/RAM/req/min são parâmetros do exercício; os slides fixam perfil 95/5 e pico 10x. DB, cache, broker, borda e ferramentas gerenciadas fora deste orçamento. Não implantado."
+      },
       "message": "Organização feita no Desktop preservada antes da versão linear",
-      "createdAt": "2026-10-07T14:39:42.111762Z",
-      "projectName": "Arquitetura Santa Cecília",
-      "projectDescription": "Arquitetura de referência da palestra: Como projetar sistemas escaláveis, seguros e preparados para o mundo real. Alinhada aos 25 slides do PPT e às 25 páginas do PDF: borda, entrada, orquestração, dados, observabilidade e entrega. 95% leitura/5% escrita, pico 10x; fila de 50 mil mensagens/h, workers 3→20 e exemplo regional 40/220 ms. Blocos explicam motivo, segurança e fonte. Histórico reconstrói slides 5 e 13–19; versões anteriores e Labs mantidos. Parâmetros de custo/capacidade são didáticos; simulação não mede produção. Detalhamento de outbox/DLQ/schema permanece como apoio, sem alterar o desenho original. O tempo da fala fica a critério dos apresentadores.",
-      "projectCategory": "software",
-      "projectStatus": "review",
       "nodes": [
         {
           "data": {
@@ -17026,6 +17595,14 @@
           "type": "architecture"
         }
       ],
+      "projectCategory": "software",
+      "projectDescription": "Arquitetura de referência da palestra: Como projetar sistemas escaláveis, seguros e preparados para o mundo real. Alinhada aos 25 slides do PPT e às 25 páginas do PDF: borda, entrada, orquestração, dados, observabilidade e entrega. 95% leitura/5% escrita, pico 10x; fila de 50 mil mensagens/h, workers 3→20 e exemplo regional 40/220 ms. Blocos explicam motivo, segurança e fonte. Histórico reconstrói slides 5 e 13–19; versões anteriores e Labs mantidos. Parâmetros de custo/capacidade são didáticos; simulação não mede produção. Detalhamento de outbox/DLQ/schema permanece como apoio, sem alterar o desenho original. O tempo da fala fica a critério dos apresentadores.",
+      "projectName": "Arquitetura Santa Cecília",
+      "projectStatus": "review",
+      "version": 20
+    },
+    {
+      "createdAt": "2026-10-07T14:39:42.111Z",
       "edges": [
         {
           "animated": false,
@@ -17588,6 +18165,7 @@
           "type": "smoothstep"
         }
       ],
+      "id": "apresentacao-linear-v21",
       "infrastructure": {
         "bandwidthMbps": 1000,
         "cpuPerHost": 4,
@@ -17599,17 +18177,8 @@
         "packetLoss": 0,
         "payloadKB": 32,
         "workloadScope": "Recursos ilustrativos dos containers de catálogo, checkout e notificações (slide 19). CPU/RAM/req/min são parâmetros do exercício; os slides fixam perfil 95/5 e pico 10x. DB, cache, broker, borda e ferramentas gerenciadas fora deste orçamento. Não implantado."
-      }
-    },
-    {
-      "id": "apresentacao-linear-v21",
-      "version": 21,
+      },
       "message": "Apresentação linear · 23 blocos numerados na ordem dos ganchos dos slides",
-      "createdAt": "2026-10-07T14:39:42.111762Z",
-      "projectName": "Arquitetura Santa Cecília",
-      "projectDescription": "Versão linear para a explicação do e-commerce da palestra. 23 blocos numerados, da esquerda para a direita, seguindo os ganchos dos slides: público global, DNS/CDN, entrada, apps/identidade, cache, writer/réplicas, fila/worker, observabilidade, multi-região, referência final, entrega e proteção do pico. Números indicam ordem da fala; conexões mantêm suas funções reais de dados, controle, replicação e operação. Navegar pelo trecho explicado em zoom legível. v19 e a organização anterior do Desktop permanecem no histórico. Guia de ganchos em docs/apresentacao/06-guia-linear-e-ganchos.md. Motivos, segurança e exemplos dos slides preservados.",
-      "projectCategory": "software",
-      "projectStatus": "review",
       "nodes": [
         {
           "data": {
@@ -18722,6 +19291,1133 @@
           "type": "architecture"
         }
       ],
+      "projectCategory": "software",
+      "projectDescription": "Versão linear para a explicação do e-commerce da palestra. 23 blocos numerados, da esquerda para a direita, seguindo os ganchos dos slides: público global, DNS/CDN, entrada, apps/identidade, cache, writer/réplicas, fila/worker, observabilidade, multi-região, referência final, entrega e proteção do pico. Números indicam ordem da fala; conexões mantêm suas funções reais de dados, controle, replicação e operação. Navegar pelo trecho explicado em zoom legível. v19 e a organização anterior do Desktop permanecem no histórico. Guia de ganchos em docs/apresentacao/06-guia-linear-e-ganchos.md. Motivos, segurança e exemplos dos slides preservados.",
+      "projectName": "Arquitetura Santa Cecília",
+      "projectStatus": "review",
+      "version": 21
+    },
+    {
+      "id": "palestra-camadas-v22",
+      "version": 22,
+      "message": "Desenho por camadas e jornadas do e-commerce conforme os slides 13–21",
+      "createdAt": "2026-10-07T14:54:00.674Z",
+      "projectName": "Arquitetura Santa Cecília",
+      "projectDescription": "E-commerce global da palestra: 95% leitura, 5% escrita e pico 10x. Desenho por camadas, baseado na referência do slide 19 e nas peças dos slides 13–18. Borda e entrada à esquerda; aplicações ao centro; cache/réplicas no ramo de leitura, writer no ramo de compra e fila/notificações abaixo. Observabilidade à direita; entrega, orquestração e autoscaler na base. Região secundária junto à réplica regional. Explicar as 8 peças na ordem da palestra e depois percorrer catálogo e compra. DNS, identidade e operação têm funções próprias. Exemplos e segurança dos slides preservados. Guia: docs/apresentacao/07-guia-de-leitura-por-camadas.md. v19–v21 e a evolução anterior permanecem no histórico.",
+      "projectCategory": "software",
+      "projectStatus": "review",
+      "nodes": [
+        {
+          "data": {
+            "availability": 99.95,
+            "capacity": 200000,
+            "cpu": 30,
+            "currentLoad": 12000,
+            "deployment": {},
+            "description": "BORDA | Slides 3–4, 13, 19. Clientes em vários continentes e fusos; milhões de visitas/dia. Black Friday: pico 10x. Perfil do caso: 95% leitura (catálogo, busca, produtos) e 5% escrita. Checkout e pagamento têm maior impacto de negócio. Os slides não fixam req/min; 2.000/20.000 pertencem aos Labs. Perguntas: quantos usuários, de onde, qual pico e o que pode atrasar?",
+            "instances": 1,
+            "kind": "client",
+            "label": "Usuários globais",
+            "latency": 10,
+            "memory": 30,
+            "monthlyCost": 0,
+            "replicas": 1,
+            "storage": 2,
+            "technology": "Web / mobile"
+          },
+          "id": "users",
+          "position": {
+            "x": 0,
+            "y": 470
+          },
+          "type": "architecture"
+        },
+        {
+          "data": {
+            "availability": 99.95,
+            "capacity": 200000,
+            "cpu": 30,
+            "currentLoad": 12000,
+            "deployment": {},
+            "description": "BORDA | Slides 13, 18–19. Resolve o domínio e orienta o destino regional; não transporta cada requisição HTTPS. Consulta DNS e tráfego da aplicação são relações distintas. Health checks e política de roteamento participam da troca de região. Proximidade geográfica e continuidade são os motivos da peça. Exemplos de provedores vêm dos slides; a escolha concreta permanece aberta.",
+            "instances": 2,
+            "kind": "network",
+            "label": "DNS geográfico",
+            "latency": 10,
+            "memory": 30,
+            "monthlyCost": 0,
+            "replicas": 2,
+            "storage": 0,
+            "technology": "Route 53 / Cloud DNS"
+          },
+          "id": "dns",
+          "position": {
+            "x": 0,
+            "y": 100
+          },
+          "type": "architecture"
+        },
+        {
+          "data": {
+            "availability": 99.95,
+            "capacity": 200000,
+            "cpu": 30,
+            "currentLoad": 12000,
+            "deployment": {},
+            "description": "BORDA | Slide 19. Proteção contra tráfego malicioso e ataques volumétricos antes da aplicação. Regras e bloqueios complementam o rate limiting da entrada. Autenticação e autorização continuam nas APIs; WAF não conhece todas as regras do domínio. Sem acesso público direto a banco, cache ou fila. Provedor não definido no material.",
+            "instances": 2,
+            "kind": "gateway",
+            "label": "WAF / anti-DDoS",
+            "latency": 10,
+            "memory": 30,
+            "monthlyCost": 0,
+            "replicas": 2,
+            "storage": 8,
+            "technology": "WAF / proteção DDoS"
+          },
+          "id": "waf",
+          "position": {
+            "x": 400,
+            "y": 470
+          },
+          "type": "architecture"
+        },
+        {
+          "data": {
+            "availability": 99.95,
+            "capacity": 200000,
+            "cpu": 30,
+            "currentLoad": 12000,
+            "deployment": {},
+            "description": "BORDA | Slides 13–14, 18–19. Imagens, CSS e JS perto do usuário, reduzindo latência e trabalho do backend. Slide 13: 90% do catálogo é conteúdo que não muda a cada visita; isso não equivale a uma taxa de cache HIT medida. Conteúdo dinâmico segue à entrada. Não cachear dados de pagamento/documentos. CloudFront e Cloudflare aparecem também como exemplos de alcance global no slide 18.",
+            "instances": 2,
+            "kind": "gateway",
+            "label": "CDN global",
+            "latency": 10,
+            "memory": 30,
+            "monthlyCost": 0,
+            "replicas": 2,
+            "storage": 8,
+            "technology": "Cloudflare / Fastly"
+          },
+          "id": "cdn",
+          "position": {
+            "x": 800,
+            "y": 470
+          },
+          "type": "architecture"
+        },
+        {
+          "data": {
+            "availability": 99.95,
+            "capacity": 120000,
+            "cpu": 30,
+            "currentLoad": 12000,
+            "deployment": {},
+            "description": "ENTRADA | Slides 10, 14, 19, 21. Distribui tráfego entre instâncias saudáveis e retira quem não responde. TLS termina na entrada; uma nova sessão TLS protege o trecho até o backend, atendendo HTTPS em todos os trechos citados no slide. Rate limiting por identidade/origem; limites de conexão e timeout. Quando o pico excede o planejado, controlar acesso e preservar checkout/catálogo.",
+            "instances": 2,
+            "kind": "gateway",
+            "label": "Gateway / LB",
+            "latency": 10,
+            "memory": 30,
+            "monthlyCost": 250,
+            "replicas": 2,
+            "storage": 1,
+            "technology": "L7 / HTTPS / rate limiting"
+          },
+          "id": "lb",
+          "position": {
+            "x": 1200,
+            "y": 470
+          },
+          "type": "architecture"
+        },
+        {
+          "data": {
+            "availability": 99.95,
+            "capacity": 40000,
+            "cpu": 30,
+            "currentLoad": 8000,
+            "deployment": {},
+            "description": "ENTRADA | Slides 15, 19. Alternativas do slide: Auth0, Keycloak, Cognito. As APIs conferem identidade e autorização antes do domínio. Catálogo público pode ser anônimo; recursos privados exigem permissão. Token válido não autoriza ler o pedido de outro cliente. Relações representam configuração/validação de identidade; não implicam chamada ao provedor em cada request.",
+            "instances": 2,
+            "kind": "service",
+            "label": "Autenticação",
+            "latency": 10,
+            "memory": 30,
+            "monthlyCost": 0,
+            "replicas": 2,
+            "storage": 8,
+            "technology": "OAuth2/OIDC / Keycloak"
+          },
+          "id": "identity",
+          "position": {
+            "x": 1200,
+            "y": 60
+          },
+          "type": "architecture"
+        },
+        {
+          "data": {
+            "availability": 99.95,
+            "capacity": 200000,
+            "cpu": 30,
+            "currentLoad": 12000,
+            "deployment": {},
+            "description": "ENTRADA | Slide 21. Em pico extremo, uma fila de acesso controla quantos clientes entram por vez. É uma política da entrada, ativada quando necessária; não é a fila de tarefas pós-compra. Rate limiting, espera e capacidade planejada trabalham juntos. Esta relação mostra controle de admissão, não uma dependência obrigatória em toda navegação.",
+            "instances": 2,
+            "kind": "gateway",
+            "label": "Sala de espera",
+            "latency": 10,
+            "memory": 30,
+            "monthlyCost": 0,
+            "replicas": 2,
+            "storage": 8,
+            "technology": "Controle de admissão"
+          },
+          "id": "waiting",
+          "position": {
+            "x": 1200,
+            "y": 860
+          },
+          "type": "architecture"
+        },
+        {
+          "data": {
+            "availability": 99.95,
+            "capacity": 30000,
+            "cpu": 30,
+            "currentLoad": 6000,
+            "deployment": {},
+            "description": "ORQUESTRAÇÃO | Slides 8–9, 15–17, 19, 21. Três instâncias de referência, descartáveis e sem estado local de sessão. Consultas repetidas usam cache; MISS consulta uma réplica saudável. Catálogo pode aceitar atraso de propagação. Timeout, retry limitado e circuit breaker isolam dependências lentas (slide 12). Modo degradado pode desligar recomendações/avaliações para preservar catálogo e checkout.",
+            "instances": 3,
+            "kind": "service",
+            "label": "API de catálogo",
+            "latency": 10,
+            "memory": 30,
+            "monthlyCost": 180,
+            "replicas": 3,
+            "runtime": {
+              "autoscaling": true,
+              "cpuLimit": 1,
+              "cpuRequest": 0.25,
+              "evidence": "Slide 19: containers em Kubernetes ou equivalente. Slide 18: workers de 3 para 20; escala por fila requer métrica própria. CPU/recursos são parâmetros do exemplo, não dados do PPT/PDF.",
+              "image": "demo/catalog:palestra",
+              "liveness": true,
+              "maxReplicas": 20,
+              "memoryLimit": 512,
+              "memoryRequest": 256,
+              "minReplicas": 3,
+              "namespace": "santa-cecilia",
+              "ports": "3000/TCP",
+              "privileged": false,
+              "readiness": true,
+              "role": "kubernetes",
+              "targetCpu": 65
+            },
+            "storage": 8,
+            "technology": "Stateless / containers"
+          },
+          "id": "catalog",
+          "position": {
+            "x": 1620,
+            "y": 280
+          },
+          "type": "architecture"
+        },
+        {
+          "data": {
+            "availability": 99.95,
+            "capacity": 12000,
+            "cpu": 30,
+            "currentLoad": 2400,
+            "deployment": {},
+            "description": "ORQUESTRAÇÃO | Slides 3–4, 11–12, 15, 17, 19, 21. Três instâncias sem sessão local. Autenticação e autorização por pedido antes do domínio. Estoque final e confirmação de compra usam a fonte de verdade; dados exibidos em cache/réplica podem atrasar. Evitar pedido/cobrança duplicados. Timeout, retry e circuit breaker contêm falhas; pagamento externo exige confirmação/reconciliação. Detalhes de idempotência e outbox ficam nas notas de apoio.",
+            "instances": 3,
+            "kind": "service",
+            "label": "API de checkout",
+            "latency": 10,
+            "memory": 30,
+            "monthlyCost": 220,
+            "replicas": 3,
+            "runtime": {
+              "autoscaling": true,
+              "cpuLimit": 1,
+              "cpuRequest": 0.25,
+              "evidence": "Slide 19: containers em Kubernetes ou equivalente. Slide 18: workers de 3 para 20; escala por fila requer métrica própria. CPU/recursos são parâmetros do exemplo, não dados do PPT/PDF.",
+              "image": "demo/checkout:palestra",
+              "liveness": true,
+              "maxReplicas": 20,
+              "memoryLimit": 512,
+              "memoryRequest": 256,
+              "minReplicas": 3,
+              "namespace": "santa-cecilia",
+              "ports": "3000/TCP",
+              "privileged": false,
+              "readiness": true,
+              "role": "kubernetes",
+              "targetCpu": 65
+            },
+            "storage": 8,
+            "technology": "Stateless / containers"
+          },
+          "id": "checkout",
+          "position": {
+            "x": 1620,
+            "y": 690
+          },
+          "type": "architecture"
+        },
+        {
+          "data": {
+            "availability": 99.95,
+            "capacity": 80000,
+            "cpu": 30,
+            "currentLoad": 12000,
+            "deployment": {},
+            "description": "DADOS | Slides 9, 16–17, 19. Memória rápida para consultas repetidas de catálogo, produto e busca; HIT evita SQL, MISS usa uma réplica. Nunca cachear pagamento ou documento; informação pessoal requer TTL curto, conforme o slide 16. TTL/invalidação são políticas a definir; nenhum valor em segundos é fixado pelos slides. Cache é reconstruível, não fonte de verdade para compra. Falha pede fallback com limite de carga.",
+            "instances": 2,
+            "kind": "cache",
+            "label": "Cache de catálogo",
+            "latency": 10,
+            "memory": 30,
+            "monthlyCost": 160,
+            "replicas": 2,
+            "storage": 12,
+            "technology": "Redis / Memcached"
+          },
+          "id": "redis",
+          "position": {
+            "x": 2050,
+            "y": 110
+          },
+          "type": "architecture"
+        },
+        {
+          "data": {
+            "availability": 99.95,
+            "capacity": 20000,
+            "cpu": 30,
+            "currentLoad": 4000,
+            "deployment": {},
+            "description": "DADOS | Slides 11, 17, 19. Fonte da verdade para checkout, pagamento confirmado e estoque final. Uma escrita autoritativa; réplicas de leitura recebem propagação e podem atrasar. Criptografia em repouso e credenciais de menor privilégio. PostgreSQL, MySQL e SQL Server são alternativas do slide; o schema de oito tabelas é aprofundamento do nosso exemplo, não requisito imposto pela palestra. Standby/backup complementam HA; validar recuperação.",
+            "instances": 2,
+            "kind": "database",
+            "label": "Banco de escrita",
+            "latency": 10,
+            "memory": 30,
+            "monthlyCost": 400,
+            "replicas": 2,
+            "schema": {
+              "engine": "PostgreSQL",
+              "paradigm": "relational",
+              "tables": [
+                {
+                  "columns": [
+                    {
+                      "id": "products-id",
+                      "name": "id",
+                      "nullable": false,
+                      "primaryKey": true,
+                      "type": "uuid",
+                      "unique": true
+                    },
+                    {
+                      "id": "products-sku",
+                      "name": "sku",
+                      "nullable": false,
+                      "primaryKey": false,
+                      "type": "varchar",
+                      "unique": true
+                    },
+                    {
+                      "id": "products-name",
+                      "name": "name",
+                      "nullable": false,
+                      "primaryKey": false,
+                      "type": "varchar",
+                      "unique": false
+                    },
+                    {
+                      "id": "products-price",
+                      "name": "price",
+                      "nullable": false,
+                      "primaryKey": false,
+                      "type": "decimal",
+                      "unique": false
+                    }
+                  ],
+                  "description": "Catálogo público",
+                  "id": "products",
+                  "indexes": [],
+                  "name": "products"
+                },
+                {
+                  "columns": [
+                    {
+                      "id": "inventory-product_id",
+                      "name": "product_id",
+                      "nullable": false,
+                      "primaryKey": true,
+                      "references": {
+                        "columnId": "products-id",
+                        "tableId": "products"
+                      },
+                      "type": "uuid",
+                      "unique": true
+                    },
+                    {
+                      "id": "inventory-available",
+                      "name": "available",
+                      "nullable": false,
+                      "primaryKey": false,
+                      "type": "integer",
+                      "unique": false
+                    },
+                    {
+                      "id": "inventory-version",
+                      "name": "version",
+                      "nullable": false,
+                      "primaryKey": false,
+                      "type": "integer",
+                      "unique": false
+                    }
+                  ],
+                  "description": "Reserva autoritativa no checkout",
+                  "id": "inventory",
+                  "indexes": [],
+                  "name": "inventory"
+                },
+                {
+                  "columns": [
+                    {
+                      "id": "orders-id",
+                      "name": "id",
+                      "nullable": false,
+                      "primaryKey": true,
+                      "type": "uuid",
+                      "unique": true
+                    },
+                    {
+                      "id": "orders-idempotency_key",
+                      "name": "idempotency_key",
+                      "nullable": false,
+                      "primaryKey": false,
+                      "type": "varchar",
+                      "unique": true
+                    },
+                    {
+                      "id": "orders-status",
+                      "name": "status",
+                      "nullable": false,
+                      "primaryKey": false,
+                      "type": "varchar",
+                      "unique": false
+                    },
+                    {
+                      "id": "orders-total",
+                      "name": "total",
+                      "nullable": false,
+                      "primaryKey": false,
+                      "type": "decimal",
+                      "unique": false
+                    },
+                    {
+                      "id": "orders-created_at",
+                      "name": "created_at",
+                      "nullable": false,
+                      "primaryKey": false,
+                      "type": "timestamp",
+                      "unique": false
+                    },
+                    {
+                      "id": "orders-owner_subject",
+                      "name": "owner_subject",
+                      "nullable": false,
+                      "primaryKey": false,
+                      "type": "varchar",
+                      "unique": false
+                    },
+                    {
+                      "id": "orders-request_hash",
+                      "name": "request_hash",
+                      "nullable": false,
+                      "primaryKey": false,
+                      "type": "varchar",
+                      "unique": false
+                    },
+                    {
+                      "id": "orders-currency",
+                      "name": "currency",
+                      "nullable": false,
+                      "primaryKey": false,
+                      "type": "varchar",
+                      "unique": false
+                    },
+                    {
+                      "id": "orders-updated_at",
+                      "name": "updated_at",
+                      "nullable": false,
+                      "primaryKey": false,
+                      "type": "timestamp",
+                      "unique": false
+                    }
+                  ],
+                  "description": "Um pedido por chave de idempotência",
+                  "id": "orders",
+                  "indexes": [
+                    [
+                      "orders-owner_subject",
+                      "orders-created_at"
+                    ]
+                  ],
+                  "name": "orders"
+                },
+                {
+                  "columns": [
+                    {
+                      "id": "order_items-id",
+                      "name": "id",
+                      "nullable": false,
+                      "primaryKey": true,
+                      "type": "uuid",
+                      "unique": true
+                    },
+                    {
+                      "id": "order_items-order_id",
+                      "name": "order_id",
+                      "nullable": false,
+                      "primaryKey": false,
+                      "references": {
+                        "columnId": "orders-id",
+                        "tableId": "orders"
+                      },
+                      "type": "uuid",
+                      "unique": false
+                    },
+                    {
+                      "id": "order_items-product_id",
+                      "name": "product_id",
+                      "nullable": false,
+                      "primaryKey": false,
+                      "references": {
+                        "columnId": "products-id",
+                        "tableId": "products"
+                      },
+                      "type": "uuid",
+                      "unique": false
+                    },
+                    {
+                      "id": "order_items-quantity",
+                      "name": "quantity",
+                      "nullable": false,
+                      "primaryKey": false,
+                      "type": "integer",
+                      "unique": false
+                    },
+                    {
+                      "id": "order_items-unit_price",
+                      "name": "unit_price",
+                      "nullable": false,
+                      "primaryKey": false,
+                      "type": "decimal",
+                      "unique": false
+                    }
+                  ],
+                  "description": "Itens do pedido",
+                  "id": "order_items",
+                  "indexes": [
+                    [
+                      "order_items-order_id"
+                    ],
+                    [
+                      "order_items-product_id"
+                    ]
+                  ],
+                  "name": "order_items"
+                },
+                {
+                  "columns": [
+                    {
+                      "id": "payment_events-id",
+                      "name": "id",
+                      "nullable": false,
+                      "primaryKey": true,
+                      "type": "uuid",
+                      "unique": true
+                    },
+                    {
+                      "id": "payment_events-provider_event_id",
+                      "name": "provider_event_id",
+                      "nullable": false,
+                      "primaryKey": false,
+                      "type": "varchar",
+                      "unique": true
+                    },
+                    {
+                      "id": "payment_events-order_id",
+                      "name": "order_id",
+                      "nullable": false,
+                      "primaryKey": false,
+                      "references": {
+                        "columnId": "orders-id",
+                        "tableId": "orders"
+                      },
+                      "type": "uuid",
+                      "unique": false
+                    },
+                    {
+                      "id": "payment_events-status",
+                      "name": "status",
+                      "nullable": false,
+                      "primaryKey": false,
+                      "type": "varchar",
+                      "unique": false
+                    },
+                    {
+                      "id": "payment_events-received_at",
+                      "name": "received_at",
+                      "nullable": false,
+                      "primaryKey": false,
+                      "type": "timestamp",
+                      "unique": false
+                    }
+                  ],
+                  "description": "Deduplicar webhooks e correlacionar pedido",
+                  "id": "payment_events",
+                  "indexes": [
+                    [
+                      "payment_events-order_id"
+                    ]
+                  ],
+                  "name": "payment_events"
+                },
+                {
+                  "columns": [
+                    {
+                      "id": "outbox-id",
+                      "name": "id",
+                      "nullable": false,
+                      "primaryKey": true,
+                      "type": "uuid",
+                      "unique": true
+                    },
+                    {
+                      "id": "outbox-order_id",
+                      "name": "order_id",
+                      "nullable": false,
+                      "primaryKey": false,
+                      "references": {
+                        "columnId": "orders-id",
+                        "tableId": "orders"
+                      },
+                      "type": "uuid",
+                      "unique": false
+                    },
+                    {
+                      "id": "outbox-event_type",
+                      "name": "event_type",
+                      "nullable": false,
+                      "primaryKey": false,
+                      "type": "varchar",
+                      "unique": false
+                    },
+                    {
+                      "id": "outbox-created_at",
+                      "name": "created_at",
+                      "nullable": false,
+                      "primaryKey": false,
+                      "type": "timestamp",
+                      "unique": false
+                    },
+                    {
+                      "id": "outbox-published",
+                      "name": "published",
+                      "nullable": false,
+                      "primaryKey": false,
+                      "type": "boolean",
+                      "unique": false
+                    },
+                    {
+                      "id": "outbox-payload",
+                      "name": "payload",
+                      "nullable": false,
+                      "primaryKey": false,
+                      "type": "json",
+                      "unique": false
+                    },
+                    {
+                      "id": "outbox-attempts",
+                      "name": "attempts",
+                      "nullable": false,
+                      "primaryKey": false,
+                      "type": "integer",
+                      "unique": false
+                    },
+                    {
+                      "id": "outbox-published_at",
+                      "name": "published_at",
+                      "nullable": true,
+                      "primaryKey": false,
+                      "type": "timestamp",
+                      "unique": false
+                    }
+                  ],
+                  "description": "Evento na mesma transação do pedido",
+                  "id": "outbox",
+                  "indexes": [
+                    [
+                      "outbox-order_id"
+                    ],
+                    [
+                      "outbox-published",
+                      "outbox-created_at"
+                    ]
+                  ],
+                  "name": "outbox"
+                },
+                {
+                  "columns": [
+                    {
+                      "id": "reservations-id",
+                      "name": "id",
+                      "nullable": false,
+                      "primaryKey": true,
+                      "type": "uuid",
+                      "unique": true
+                    },
+                    {
+                      "id": "reservations-order_id",
+                      "name": "order_id",
+                      "nullable": false,
+                      "primaryKey": false,
+                      "references": {
+                        "columnId": "orders-id",
+                        "tableId": "orders"
+                      },
+                      "type": "uuid",
+                      "unique": false
+                    },
+                    {
+                      "id": "reservations-product_id",
+                      "name": "product_id",
+                      "nullable": false,
+                      "primaryKey": false,
+                      "references": {
+                        "columnId": "products-id",
+                        "tableId": "products"
+                      },
+                      "type": "uuid",
+                      "unique": false
+                    },
+                    {
+                      "id": "reservations-quantity",
+                      "name": "quantity",
+                      "nullable": false,
+                      "primaryKey": false,
+                      "type": "integer",
+                      "unique": false
+                    },
+                    {
+                      "id": "reservations-status",
+                      "name": "status",
+                      "nullable": false,
+                      "primaryKey": false,
+                      "type": "varchar",
+                      "unique": false
+                    },
+                    {
+                      "id": "reservations-expires_at",
+                      "name": "expires_at",
+                      "nullable": false,
+                      "primaryKey": false,
+                      "type": "timestamp",
+                      "unique": false
+                    }
+                  ],
+                  "description": "Reserva por pedido/produto, com expiração e compensação idempotente; estado deve ser reconciliado com pagamento.",
+                  "id": "reservations",
+                  "indexes": [
+                    [
+                      "reservations-order_id"
+                    ],
+                    [
+                      "reservations-product_id"
+                    ],
+                    [
+                      "reservations-status",
+                      "reservations-expires_at"
+                    ]
+                  ],
+                  "name": "reservations"
+                },
+                {
+                  "columns": [
+                    {
+                      "id": "processed_events-event_id",
+                      "name": "event_id",
+                      "nullable": false,
+                      "primaryKey": true,
+                      "references": {
+                        "columnId": "outbox-id",
+                        "tableId": "outbox"
+                      },
+                      "type": "uuid",
+                      "unique": false
+                    },
+                    {
+                      "id": "processed_events-consumer_name",
+                      "name": "consumer_name",
+                      "nullable": false,
+                      "primaryKey": true,
+                      "type": "varchar",
+                      "unique": false
+                    },
+                    {
+                      "id": "processed_events-processed_at",
+                      "name": "processed_at",
+                      "nullable": false,
+                      "primaryKey": false,
+                      "type": "timestamp",
+                      "unique": false
+                    }
+                  ],
+                  "description": "Chave composta deduplica o mesmo evento por consumidor. Efeito externo exige suporte de idempotência próprio.",
+                  "id": "processed_events",
+                  "indexes": [],
+                  "name": "processed_events"
+                }
+              ]
+            },
+            "storage": 42,
+            "technology": "PostgreSQL / SQL relacional"
+          },
+          "id": "primary",
+          "position": {
+            "x": 2050,
+            "y": 690
+          },
+          "type": "architecture"
+        },
+        {
+          "data": {
+            "availability": 99.95,
+            "capacity": 30000,
+            "cpu": 30,
+            "currentLoad": 6000,
+            "deployment": {},
+            "description": "DADOS | Slides 11, 17–18. Réplica próxima da aplicação na região principal. Catálogo/busca em MISS podem usar um destino saudável; réplicas A/B são alternativas, não duas leituras obrigatórias da mesma consulta. Monitorar atraso; nenhum checkout decide estoque por dado atrasado. Separação de leitura e escrita acompanha o perfil 95/5 do caso.",
+            "instances": 1,
+            "kind": "database",
+            "label": "Réplica A",
+            "latency": 10,
+            "memory": 30,
+            "monthlyCost": 180,
+            "replicas": 1,
+            "storage": 42,
+            "technology": "SQL / leitura eventual"
+          },
+          "id": "read1",
+          "position": {
+            "x": 2460,
+            "y": 110
+          },
+          "type": "architecture"
+        },
+        {
+          "data": {
+            "availability": 99.95,
+            "capacity": 30000,
+            "cpu": 30,
+            "currentLoad": 6000,
+            "deployment": {},
+            "description": "DADOS | Slides 11, 17–18. Segunda réplica de leitura, usada para ilustrar proximidade regional. Exemplo da palestra: leitura do cliente europeu em 40 ms, comparada a 220 ms cruzando o Atlântico. São valores do exemplo dos slides, não latências medidas nesta preparação. A réplica pode atrasar; não vira outro writer automaticamente. Escolha do destino respeita região e política de dados.",
+            "instances": 1,
+            "kind": "database",
+            "label": "Réplica B",
+            "latency": 10,
+            "memory": 30,
+            "monthlyCost": 180,
+            "replicas": 1,
+            "storage": 42,
+            "technology": "SQL / região próxima"
+          },
+          "id": "read2",
+          "position": {
+            "x": 2460,
+            "y": 390
+          },
+          "type": "architecture"
+        },
+        {
+          "data": {
+            "availability": 99.95,
+            "capacity": 40000,
+            "cpu": 30,
+            "currentLoad": 8000,
+            "deployment": {},
+            "description": "DADOS | Slides 18–19. Recebe trabalho que não exige resposta imediata; absorve pico e desacopla workers. Exemplo: 50 mil mensagens por hora na Black Friday. Payload só com o necessário, sem segredos em texto puro. As opções são alternativas de tecnologia, não três filas simultâneas. Publicação pós-compra é uma relação lógica; o mecanismo transacional/outbox e a DLQ estão preservados no aprofundamento anterior.",
+            "instances": 2,
+            "kind": "queue",
+            "label": "Fila assíncrona",
+            "latency": 10,
+            "memory": 30,
+            "monthlyCost": 120,
+            "replicas": 2,
+            "storage": 16,
+            "technology": "SQS / RabbitMQ / Pub/Sub"
+          },
+          "id": "queue",
+          "position": {
+            "x": 2050,
+            "y": 1120
+          },
+          "type": "architecture"
+        },
+        {
+          "data": {
+            "availability": 99.95,
+            "capacity": 15000,
+            "cpu": 30,
+            "currentLoad": 3000,
+            "deployment": {},
+            "description": "ORQUESTRAÇÃO | Slides 18–19. Processa e-mail e baixa operacional de estoque fora da resposta imediata. A decisão de vender/reservar estoque permanece no checkout e writer (slides 4, 11, 17); a etapa posterior não permite venda sem saldo. Exemplo do slide 18: 50 mil mensagens/hora; workers de 3 para 20. Escala por backlog/idade, com teto e alarme (slide 21). Mensagem mínima, sem segredos; tratar repetições com idempotência.",
+            "instances": 3,
+            "kind": "service",
+            "label": "Notificações",
+            "latency": 10,
+            "memory": 30,
+            "monthlyCost": 100,
+            "replicas": 3,
+            "runtime": {
+              "autoscaling": true,
+              "cpuLimit": 1,
+              "cpuRequest": 0.25,
+              "evidence": "Slide 18: 3→20 workers e 50 mil mensagens/h. Escala por tamanho/idade da fila, não apenas CPU. Configuração proposta para explicar o caso; não implantada.",
+              "image": "demo/worker:palestra",
+              "liveness": true,
+              "maxReplicas": 20,
+              "memoryLimit": 512,
+              "memoryRequest": 256,
+              "minReplicas": 3,
+              "namespace": "santa-cecilia",
+              "ports": "3000/TCP",
+              "privileged": false,
+              "readiness": true,
+              "role": "kubernetes",
+              "targetCpu": 65
+            },
+            "storage": 8,
+            "technology": "Worker / escala por fila"
+          },
+          "id": "worker",
+          "position": {
+            "x": 2460,
+            "y": 1120
+          },
+          "type": "architecture"
+        },
+        {
+          "data": {
+            "availability": 99.95,
+            "capacity": 120000,
+            "cpu": 30,
+            "currentLoad": 12000,
+            "deployment": {},
+            "description": "MULTI-REGIÃO | Slide 18. Uma cópia próxima atende clientes em outro continente; outra região pode assumir quando a principal cai. DNS geográfico, CDN global, aplicação regional e réplica regional participam do desenho. Política de residência de dados faz parte da decisão. O slide não fixa RPO/RTO nem declara escrita active-active: promoção, capacidade disponível, roteamento e consistência precisam ser planejados e ensaiados.",
+            "instances": 2,
+            "kind": "cloud",
+            "label": "Região secundária",
+            "latency": 10,
+            "memory": 30,
+            "monthlyCost": 300,
+            "replicas": 2,
+            "storage": 100,
+            "technology": "DNS geográfico / failover"
+          },
+          "id": "region",
+          "position": {
+            "x": 2460,
+            "y": 780
+          },
+          "type": "architecture"
+        },
+        {
+          "data": {
+            "availability": 99.95,
+            "capacity": 200000,
+            "cpu": 30,
+            "currentLoad": 12000,
+            "deployment": {},
+            "description": "OBSERVABILIDADE | Slides 6–7, 18–20, 22–23. Latência P95, throughput, erros, saturação de gateway/app/cache/banco e backlog orientam o investimento e o rollback. Exemplo do slide 18: painel mostra latência subindo 3 minutos antes do primeiro erro. Essa antecipação é ilustrativa, não garantia. Disponibilidade-alvo tem custo; números cadastrados no Build Arch são parâmetros de modelo, não SLO comprovado. Slide 7, indisponibilidade anual aproximada: 99% = 3,65 dias; 99,9% = 8,8 h; 99,99% = 52 min; 99,999% = 5 min.",
+            "instances": 2,
+            "kind": "service",
+            "label": "Métricas / painel",
+            "latency": 10,
+            "memory": 30,
+            "monthlyCost": 150,
+            "replicas": 2,
+            "storage": 8,
+            "technology": "Grafana / Datadog"
+          },
+          "id": "metrics",
+          "position": {
+            "x": 2940,
+            "y": 200
+          },
+          "type": "architecture"
+        },
+        {
+          "data": {
+            "availability": 99.95,
+            "capacity": 200000,
+            "cpu": 30,
+            "currentLoad": 12000,
+            "deployment": {},
+            "description": "OBSERVABILIDADE | Slides 18–19. Centraliza registros de instâncias e regiões para investigar incidentes. Nunca registrar senha, cartão ou dado pessoal sem mascarar. Correlacionar pedido/requisição quando aplicável e controlar acesso/retenção. Observabilidade deve mostrar onde o gargalo e a falha aparecem, sem expor informação sensível.",
+            "instances": 2,
+            "kind": "service",
+            "label": "Logs centralizados",
+            "latency": 10,
+            "memory": 30,
+            "monthlyCost": 0,
+            "replicas": 2,
+            "storage": 8,
+            "technology": "Elastic / Loki"
+          },
+          "id": "logs",
+          "position": {
+            "x": 2940,
+            "y": 600
+          },
+          "type": "architecture"
+        },
+        {
+          "data": {
+            "availability": 99.95,
+            "capacity": 200000,
+            "cpu": 30,
+            "currentLoad": 12000,
+            "deployment": {},
+            "description": "OBSERVABILIDADE | Slide 18. Acompanha a requisição entre componentes para distinguir tempo de rede, aplicação e dependências. Complementa métricas e logs; não substitui os dois. Telemetria ocorre em um plano de operação separado do fluxo de compra. Propagação de contexto e mascaramento de dados devem ser definidos.",
+            "instances": 2,
+            "kind": "service",
+            "label": "Tracing distribuído",
+            "latency": 10,
+            "memory": 30,
+            "monthlyCost": 0,
+            "replicas": 2,
+            "storage": 8,
+            "technology": "Tracing entre instâncias"
+          },
+          "id": "tracing",
+          "position": {
+            "x": 2940,
+            "y": 1000
+          },
+          "type": "architecture"
+        },
+        {
+          "data": {
+            "availability": 99.95,
+            "capacity": 200000,
+            "cpu": 30,
+            "currentLoad": 12000,
+            "deployment": {},
+            "description": "ENTREGA | Slide 19. Análise estática de código executada em cada pull request, integrada ao fluxo de qualidade antes do deploy. Complementa testes, revisão e monitoramento; não comprova comportamento de produção sozinha. Resultado alimenta o CI/CD, sem participar da jornada HTTP do cliente.",
+            "instances": 2,
+            "kind": "service",
+            "label": "Análise estática",
+            "latency": 10,
+            "memory": 30,
+            "monthlyCost": 0,
+            "replicas": 2,
+            "storage": 8,
+            "technology": "Verificação a cada PR"
+          },
+          "id": "staticanalysis",
+          "position": {
+            "x": 800,
+            "y": 1560
+          },
+          "type": "architecture"
+        },
+        {
+          "data": {
+            "availability": 99.95,
+            "capacity": 200000,
+            "cpu": 30,
+            "currentLoad": 12000,
+            "deployment": {},
+            "description": "ENTREGA | Slides 19–20, 25. Build, testes e deploy gradual. Versão nova recebe uma fração do tráfego ou uma região; métricas determinam expansão ou retorno à anterior. Rollback limita o alcance do erro. Artefato versionado, credenciais por ambiente e compatibilidade de dados sustentam o caminho de volta. Relação de entrega/control plane, não chamada feita por um cliente.",
+            "instances": 2,
+            "kind": "service",
+            "label": "CI/CD e rollback",
+            "latency": 10,
+            "memory": 30,
+            "monthlyCost": 0,
+            "replicas": 2,
+            "storage": 8,
+            "technology": "Build / teste / canary"
+          },
+          "id": "delivery",
+          "position": {
+            "x": 1200,
+            "y": 1560
+          },
+          "type": "architecture"
+        },
+        {
+          "data": {
+            "availability": 99.95,
+            "capacity": 200000,
+            "cpu": 30,
+            "currentLoad": 12000,
+            "deployment": {},
+            "description": "ORQUESTRAÇÃO | Slide 19. Ambiente de containers que executa catálogo, checkout e notificações; relações de controle, sem tráfego de clientes pelo scheduler. Distribuição de instâncias e recuperação de unidades falhas sustentam a escala horizontal. Configuração de recursos e health checks é proposta didática. A escolha exata da plataforma depende do provedor e da equipe; não fixa um serviço cloud para o caso. Slide 24: AWS, GCP, Azure e Alibaba Cloud; comparar compute, storage, egress e CDN, incluindo operação própria versus gerenciada, sem preços fixos.",
+            "instances": 2,
+            "kind": "kubernetes",
+            "label": "Containers",
+            "latency": 10,
+            "memory": 30,
+            "monthlyCost": 0,
+            "replicas": 2,
+            "storage": 8,
+            "technology": "Kubernetes ou equivalente"
+          },
+          "id": "orchestrator",
+          "position": {
+            "x": 1620,
+            "y": 1560
+          },
+          "type": "architecture"
+        },
+        {
+          "data": {
+            "availability": 99.95,
+            "capacity": 200000,
+            "cpu": 30,
+            "currentLoad": 12000,
+            "deployment": {},
+            "description": "ORQUESTRAÇÃO | Slides 18–19, 21. Ajusta réplicas por CPU nos apps e tamanho/idade da fila nos workers. O exemplo dos slides cresce de 3 para 20 workers; o máximo 20 é referência deste exercício. Há limite conhecido e alarme para decisão humana. Autoscaling de API não remove gargalo compartilhado no banco (slide 23). Serviços e métricas precisam de implementação real.",
+            "instances": 2,
+            "kind": "kubernetes",
+            "label": "Autoscaler",
+            "latency": 10,
+            "memory": 30,
+            "monthlyCost": 0,
+            "replicas": 2,
+            "storage": 8,
+            "technology": "CPU / backlog / teto"
+          },
+          "id": "autoscaler",
+          "position": {
+            "x": 2050,
+            "y": 1560
+          },
+          "type": "architecture"
+        }
+      ],
       "edges": [
         {
           "animated": false,
@@ -19299,6 +20995,6 @@
     }
   ],
   "status": "review",
-  "updatedAt": "2026-10-07T14:39:42.111762Z",
-  "version": 21
+  "updatedAt": "2026-10-07T14:56:05.015Z",
+  "version": 22
 }

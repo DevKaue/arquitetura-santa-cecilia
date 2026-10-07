@@ -24,18 +24,34 @@ for (const file of files) {
   for (const revision of project.revisions ?? []) verifyGraph(revision);
   if (file.startsWith('00-')) {
     assert.equal(project.name, 'Arquitetura Santa Cecília');
-    assert.equal(project.version, 21);
+    assert.equal(project.version, 22);
     assert.equal(project.nodes.length, 23);
     assert.equal(project.edges.length, 40);
-    assert.equal(project.revisions.length, 21);
+    assert.equal(project.revisions.length, 22);
     const linear = JSON.parse(read('docs/validacao/layout-linear.json'));
-    assert.deepEqual(project.nodes.map((node) => node.id), linear.nodeOrder);
-    assert.ok(project.nodes.every((node) => node.position.y === 0));
-    for (let i = 0; i < project.nodes.length; i++) {
-      assert.ok(project.nodes[i].data.label.startsWith(String(i + 1).padStart(2, '0') + ' '));
-      if (i) assert.ok(project.nodes[i].position.x - project.nodes[i - 1].position.x >= 400);
+    const historicalLinear = project.revisions.find((r) => r.version === 21);
+    assert.deepEqual(historicalLinear.nodes.map((node) => node.id), linear.nodeOrder);
+    assert.ok(historicalLinear.nodes.every((node) => node.position.y === 0));
+    const layers = JSON.parse(read('docs/validacao/layout-camadas.json'));
+    assert.equal(layers.version, project.version);
+    assert.deepEqual(Object.values(layers.groups).flat().sort(), project.nodes.map((node) => node.id).sort());
+    assert.deepEqual(layers.readingOrder.map((piece) => piece.piece), [1, 2, 3, 4, 5, 6, 7, 8]);
+    const referenceNodes = new Map(project.revisions.find((r) => r.version === 19).nodes.map((node) => [node.id, node]));
+    for (const node of project.nodes) {
+      assert.deepEqual(node.position, layers.positions[node.id]);
+      const { label: oldLabel, ...oldData } = referenceNodes.get(node.id).data;
+      const { label: newLabel, ...newData } = node.data;
+      assert.deepEqual(newData, oldData, `Conteúdo técnico alterado: ${node.id}`);
     }
-    assert.deepEqual(project.edges, project.revisions.find((r) => r.version === 19).edges, 'A organização linear deve preservar as relações.');
+    const { width, height } = layers.nodeEnvelope;
+    for (let i = 0; i < project.nodes.length; i++) {
+      for (let j = i + 1; j < project.nodes.length; j++) {
+        const a = project.nodes[i].position;
+        const b = project.nodes[j].position;
+        assert.ok(Math.abs(a.x - b.x) >= width || Math.abs(a.y - b.y) >= height, 'Blocos sobrepostos no layout.');
+      }
+    }
+    assert.deepEqual(project.edges, project.revisions.find((r) => r.version === 19).edges, 'A organização por camadas deve preservar as relações.');
     const full = project.revisions.find((revision) => revision.version === 9);
     assert.equal(full.nodes.length, 19, 'O mapa completo deve permanecer no histórico.');
     assert.equal(full.edges.length, 25);

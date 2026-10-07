@@ -2,7 +2,10 @@
 
 ## Referência do material original
 
-Principal **v19**: 23 blocos, 40 relações, alinhados aos slides 3–25. [Correspondência completa](04-correspondencia-palestra.md). A duração da fala não determina o conteúdo do mapa.
+Principal **v22**: 23 blocos, 40 relações, alinhados aos slides 3–25 e organizados por camadas e jornadas. [Correspondência completa](04-correspondencia-palestra.md). A duração da fala não determina o conteúdo do mapa.
+
+A leitura espacial da v22 e os ganchos das oito peças estão no [guia por camadas](../apresentacao/07-guia-de-leitura-por-camadas.md). As revisões de construção dos slides continuam disponíveis.
+
 
 | Camada | Blocos principais | Pergunta resolvida |
 |---|---|---|
