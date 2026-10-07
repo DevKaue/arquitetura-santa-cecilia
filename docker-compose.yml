@@ -1,0 +1,63 @@
+# Inventário didático para análise estática no Build Arch.
+# Não implementa replica PostgreSQL, HA, DNS global ou CDN.
+services:
+  web:
+    build: ./services/web
+    environment:
+      PORT: "3000"
+      ROLE: web
+    networks: [frontend]
+  gateway:
+    image: nginx:stable-alpine
+    ports: ["127.0.0.1:8080:8080"]
+    volumes: ["./gateway/nginx.conf:/etc/nginx/conf.d/default.conf:ro"]
+    depends_on: [web, catalog, checkout]
+    networks: [frontend, backend]
+  catalog:
+    build: ./services/catalog
+    environment:
+      PORT: "3000"
+      ROLE: catalog
+    depends_on: [postgres, redis]
+    networks: [backend]
+  checkout:
+    build: ./services/checkout
+    environment:
+      PORT: "3000"
+      ROLE: checkout
+    depends_on: [postgres]
+    networks: [backend]
+  relay:
+    build: ./services/relay
+    environment:
+      PORT: "3000"
+      ROLE: relay
+    depends_on: [postgres, rabbitmq]
+    networks: [backend]
+  worker:
+    build: ./services/worker
+    environment:
+      PORT: "3000"
+      ROLE: worker
+    depends_on: [rabbitmq]
+    networks: [backend]
+  postgres:
+    image: postgres:18-alpine
+    environment:
+      POSTGRES_DB: santa_cecilia_demo
+      POSTGRES_PASSWORD: "${POSTGRES_PASSWORD:?Defina POSTGRES_PASSWORD no ambiente local}"
+    volumes:
+      - postgres_data:/var/lib/postgresql
+      - ./database/schema.sql:/docker-entrypoint-initdb.d/001-schema.sql:ro
+    networks: [backend]
+  redis:
+    image: redis:8-alpine
+    networks: [backend]
+  rabbitmq:
+    image: rabbitmq:4-management-alpine
+    networks: [backend]
+networks:
+  frontend: {}
+  backend: {}
+volumes:
+  postgres_data: {}

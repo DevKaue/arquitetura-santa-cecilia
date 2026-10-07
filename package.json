@@ -1,0 +1,20 @@
+{
+  "name": "arquitetura-santa-cecilia",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Manifests e backups didáticos para inferência no Build Arch",
+  "type": "module",
+  "workspaces": [
+    "services/*"
+  ],
+  "scripts": {
+    "verificar": "node scripts/verificar-repositorio.mjs",
+    "catalogo": "node services/catalog/server.mjs"
+  },
+  "engines": {
+    "node": ">=24"
+  },
+  "devDependencies": {
+    "yaml": "2.9.1"
+  }
+}

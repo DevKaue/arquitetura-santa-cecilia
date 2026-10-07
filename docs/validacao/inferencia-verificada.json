@@ -1,0 +1,61 @@
+{
+  "yamlSyntax": "valid",
+  "composeServices": [
+    "web",
+    "gateway",
+    "catalog",
+    "checkout",
+    "relay",
+    "worker",
+    "postgres",
+    "redis",
+    "rabbitmq"
+  ],
+  "inferredNodes": 23,
+  "inferredEdges": 22,
+  "filesScanned": 43,
+  "filesRead": 14,
+  "technologies": [
+    "Web",
+    "NGINX",
+    "PostgreSQL",
+    "Redis",
+    "RabbitMQ",
+    "Docker",
+    "Docker network",
+    "Docker volume",
+    "Docker Compose"
+  ],
+  "signals": [
+    "Interface Web",
+    "Gateway NGINX",
+    "Persistência PostgreSQL",
+    "Cache Redis",
+    "Mensageria RabbitMQ",
+    "Infraestrutura Docker",
+    "Docker network: frontend · docker-compose.yml",
+    "Docker network: backend · docker-compose.yml",
+    "Docker volume: postgres_data · docker-compose.yml",
+    "Docker Compose: web · docker-compose.yml",
+    "Docker Compose: gateway · docker-compose.yml",
+    "Docker Compose: catalog · docker-compose.yml",
+    "Docker Compose: checkout · docker-compose.yml",
+    "Docker Compose: relay · docker-compose.yml",
+    "Docker Compose: worker · docker-compose.yml",
+    "Docker Compose: postgres · docker-compose.yml",
+    "Docker Compose: redis · docker-compose.yml",
+    "Docker Compose: rabbitmq · docker-compose.yml",
+    "Docker: Imagem dockerfile · 1 · services/catalog/Dockerfile",
+    "Docker: Imagem dockerfile · 1 · services/checkout/Dockerfile",
+    "Docker: Imagem dockerfile · 1 · services/relay/Dockerfile",
+    "Docker: Imagem dockerfile · 1 · services/web/Dockerfile",
+    "Docker: Imagem dockerfile · 1 · services/worker/Dockerfile"
+  ],
+  "notes": [
+    "O diagrama foi inferido de forma estática; valide fluxos dinâmicos, serviços externos e limites de domínio.",
+    "Arquivos sensíveis, dependências baixadas, binários e artefatos de build foram ignorados.",
+    "Conexões entre camadas de software são hipóteses; relações selector, Ingress, depends_on, rede e PVC têm evidência nos manifests.",
+    "Capacidade em req/min, CPU observada e topologia física não são medidas no repositório. Ajuste essas premissas antes de simular."
+  ],
+  "executedCompose": false
+}

@@ -1,0 +1,796 @@
+[
+  {
+    "lab": 1,
+    "name": "Santa Cecília | Lab 01 | Inicial: banco limita",
+    "nodes": 4,
+    "edges": 3,
+    "simulations": [
+      {
+        "pattern": "steady",
+        "stable": true,
+        "demand": 2000,
+        "throughput": 2000,
+        "latency": 81,
+        "errorRate": 0.05,
+        "saturation": 56,
+        "bottleneckId": "db",
+        "bottleneckLabel": "Banco transacional",
+        "duration": 10,
+        "availability": 99.99,
+        "recoveryMinutes": 0,
+        "finalThroughput": 2000,
+        "capacityGap": 0,
+        "overloadedNodes": 0,
+        "timeline": [
+          {
+            "minute": 0,
+            "demand": 2000,
+            "throughput": 2000,
+            "latency": 81,
+            "errorRate": 0.05,
+            "saturation": 56
+          },
+          {
+            "minute": 1,
+            "demand": 2000,
+            "throughput": 2000,
+            "latency": 81,
+            "errorRate": 0.05,
+            "saturation": 56
+          },
+          {
+            "minute": 3,
+            "demand": 2000,
+            "throughput": 2000,
+            "latency": 81,
+            "errorRate": 0.05,
+            "saturation": 56
+          },
+          {
+            "minute": 4,
+            "demand": 2000,
+            "throughput": 2000,
+            "latency": 81,
+            "errorRate": 0.05,
+            "saturation": 56
+          },
+          {
+            "minute": 5,
+            "demand": 2000,
+            "throughput": 2000,
+            "latency": 81,
+            "errorRate": 0.05,
+            "saturation": 56
+          },
+          {
+            "minute": 6,
+            "demand": 2000,
+            "throughput": 2000,
+            "latency": 81,
+            "errorRate": 0.05,
+            "saturation": 56
+          },
+          {
+            "minute": 8,
+            "demand": 2000,
+            "throughput": 2000,
+            "latency": 81,
+            "errorRate": 0.05,
+            "saturation": 56
+          },
+          {
+            "minute": 9,
+            "demand": 2000,
+            "throughput": 2000,
+            "latency": 81,
+            "errorRate": 0.05,
+            "saturation": 56
+          },
+          {
+            "minute": 10,
+            "demand": 2000,
+            "throughput": 2000,
+            "latency": 81,
+            "errorRate": 0.05,
+            "saturation": 56
+          }
+        ],
+        "nodeMetrics": [
+          {
+            "id": "db",
+            "label": "Banco transacional",
+            "kind": "database",
+            "trafficShare": 84.6,
+            "peakUtilization": 56
+          },
+          {
+            "id": "api",
+            "label": "API stateless",
+            "kind": "service",
+            "trafficShare": 92,
+            "peakUtilization": 10
+          },
+          {
+            "id": "gateway",
+            "label": "Entrada HTTPS",
+            "kind": "gateway",
+            "trafficShare": 100,
+            "peakUtilization": 2
+          },
+          {
+            "id": "users",
+            "label": "Usuários",
+            "kind": "client",
+            "trafficShare": 100,
+            "peakUtilization": 1
+          }
+        ],
+        "recommendations": [
+          "Há folga no cenário; valide agora um pico maior ou injete a falha de um componente."
+        ]
+      },
+      {
+        "pattern": "spike",
+        "stable": false,
+        "demand": 6673,
+        "throughput": 3544,
+        "latency": 895,
+        "errorRate": 68,
+        "saturation": 100,
+        "bottleneckId": "db",
+        "bottleneckLabel": "Banco transacional",
+        "duration": 10,
+        "availability": 87.76,
+        "recoveryMinutes": 0,
+        "finalThroughput": 2006,
+        "capacityGap": 3129,
+        "overloadedNodes": 1,
+        "timeline": [
+          {
+            "minute": 0,
+            "demand": 2000,
+            "throughput": 2000,
+            "latency": 81,
+            "errorRate": 0.05,
+            "saturation": 56
+          },
+          {
+            "minute": 1,
+            "demand": 2002,
+            "throughput": 2002,
+            "latency": 81,
+            "errorRate": 0.05,
+            "saturation": 56
+          },
+          {
+            "minute": 3,
+            "demand": 2085,
+            "throughput": 2085,
+            "latency": 87,
+            "errorRate": 0.05,
+            "saturation": 59
+          },
+          {
+            "minute": 4,
+            "demand": 3162,
+            "throughput": 3162,
+            "latency": 162,
+            "errorRate": 7.23,
+            "saturation": 89
+          },
+          {
+            "minute": 5,
+            "demand": 6673,
+            "throughput": 3544,
+            "latency": 895,
+            "errorRate": 68,
+            "saturation": 100
+          },
+          {
+            "minute": 6,
+            "demand": 7544,
+            "throughput": 3544,
+            "latency": 1204,
+            "errorRate": 68,
+            "saturation": 100
+          },
+          {
+            "minute": 8,
+            "demand": 3940,
+            "throughput": 3544,
+            "latency": 253,
+            "errorRate": 16.8,
+            "saturation": 100
+          },
+          {
+            "minute": 9,
+            "demand": 2200,
+            "throughput": 2200,
+            "latency": 94,
+            "errorRate": 0.05,
+            "saturation": 62
+          },
+          {
+            "minute": 10,
+            "demand": 2006,
+            "throughput": 2006,
+            "latency": 82,
+            "errorRate": 0.05,
+            "saturation": 57
+          }
+        ],
+        "nodeMetrics": [
+          {
+            "id": "db",
+            "label": "Banco transacional",
+            "kind": "database",
+            "trafficShare": 84.6,
+            "peakUtilization": 213
+          },
+          {
+            "id": "api",
+            "label": "API stateless",
+            "kind": "service",
+            "trafficShare": 92,
+            "peakUtilization": 39
+          },
+          {
+            "id": "gateway",
+            "label": "Entrada HTTPS",
+            "kind": "gateway",
+            "trafficShare": 100,
+            "peakUtilization": 8
+          },
+          {
+            "id": "users",
+            "label": "Usuários",
+            "kind": "client",
+            "trafficShare": 100,
+            "peakUtilization": 4
+          }
+        ],
+        "recommendations": [
+          "Aumente capacidade ou réplicas de Banco transacional.",
+          "Reduza chamadas síncronas no caminho crítico ou introduza cache/batching."
+        ]
+      }
+    ],
+    "live": {
+      "generated": 10000,
+      "completed": 7350,
+      "failed": 0,
+      "pending": 2649.999999999998,
+      "finished": true,
+      "seconds": 150
+    }
+  },
+  {
+    "lab": 2,
+    "name": "Santa Cecília | Lab 02 | Escalar a API não resolve",
+    "nodes": 4,
+    "edges": 3,
+    "simulations": [
+      {
+        "pattern": "steady",
+        "stable": true,
+        "demand": 2000,
+        "throughput": 2000,
+        "latency": 81,
+        "errorRate": 0.05,
+        "saturation": 56,
+        "bottleneckId": "db",
+        "bottleneckLabel": "Banco transacional",
+        "duration": 10,
+        "availability": 99.99,
+        "recoveryMinutes": 0,
+        "finalThroughput": 2000,
+        "capacityGap": 0,
+        "overloadedNodes": 0,
+        "timeline": [
+          {
+            "minute": 0,
+            "demand": 2000,
+            "throughput": 2000,
+            "latency": 81,
+            "errorRate": 0.05,
+            "saturation": 56
+          },
+          {
+            "minute": 1,
+            "demand": 2000,
+            "throughput": 2000,
+            "latency": 81,
+            "errorRate": 0.05,
+            "saturation": 56
+          },
+          {
+            "minute": 3,
+            "demand": 2000,
+            "throughput": 2000,
+            "latency": 81,
+            "errorRate": 0.05,
+            "saturation": 56
+          },
+          {
+            "minute": 4,
+            "demand": 2000,
+            "throughput": 2000,
+            "latency": 81,
+            "errorRate": 0.05,
+            "saturation": 56
+          },
+          {
+            "minute": 5,
+            "demand": 2000,
+            "throughput": 2000,
+            "latency": 81,
+            "errorRate": 0.05,
+            "saturation": 56
+          },
+          {
+            "minute": 6,
+            "demand": 2000,
+            "throughput": 2000,
+            "latency": 81,
+            "errorRate": 0.05,
+            "saturation": 56
+          },
+          {
+            "minute": 8,
+            "demand": 2000,
+            "throughput": 2000,
+            "latency": 81,
+            "errorRate": 0.05,
+            "saturation": 56
+          },
+          {
+            "minute": 9,
+            "demand": 2000,
+            "throughput": 2000,
+            "latency": 81,
+            "errorRate": 0.05,
+            "saturation": 56
+          },
+          {
+            "minute": 10,
+            "demand": 2000,
+            "throughput": 2000,
+            "latency": 81,
+            "errorRate": 0.05,
+            "saturation": 56
+          }
+        ],
+        "nodeMetrics": [
+          {
+            "id": "db",
+            "label": "Banco transacional",
+            "kind": "database",
+            "trafficShare": 84.6,
+            "peakUtilization": 56
+          },
+          {
+            "id": "api",
+            "label": "API stateless",
+            "kind": "service",
+            "trafficShare": 92,
+            "peakUtilization": 3
+          },
+          {
+            "id": "gateway",
+            "label": "Entrada HTTPS",
+            "kind": "gateway",
+            "trafficShare": 100,
+            "peakUtilization": 2
+          },
+          {
+            "id": "users",
+            "label": "Usuários",
+            "kind": "client",
+            "trafficShare": 100,
+            "peakUtilization": 1
+          }
+        ],
+        "recommendations": [
+          "Há folga no cenário; valide agora um pico maior ou injete a falha de um componente."
+        ]
+      },
+      {
+        "pattern": "spike",
+        "stable": false,
+        "demand": 6673,
+        "throughput": 3544,
+        "latency": 895,
+        "errorRate": 68,
+        "saturation": 100,
+        "bottleneckId": "db",
+        "bottleneckLabel": "Banco transacional",
+        "duration": 10,
+        "availability": 87.76,
+        "recoveryMinutes": 0,
+        "finalThroughput": 2006,
+        "capacityGap": 3129,
+        "overloadedNodes": 1,
+        "timeline": [
+          {
+            "minute": 0,
+            "demand": 2000,
+            "throughput": 2000,
+            "latency": 81,
+            "errorRate": 0.05,
+            "saturation": 56
+          },
+          {
+            "minute": 1,
+            "demand": 2002,
+            "throughput": 2002,
+            "latency": 81,
+            "errorRate": 0.05,
+            "saturation": 56
+          },
+          {
+            "minute": 3,
+            "demand": 2085,
+            "throughput": 2085,
+            "latency": 87,
+            "errorRate": 0.05,
+            "saturation": 59
+          },
+          {
+            "minute": 4,
+            "demand": 3162,
+            "throughput": 3162,
+            "latency": 162,
+            "errorRate": 7.23,
+            "saturation": 89
+          },
+          {
+            "minute": 5,
+            "demand": 6673,
+            "throughput": 3544,
+            "latency": 895,
+            "errorRate": 68,
+            "saturation": 100
+          },
+          {
+            "minute": 6,
+            "demand": 7544,
+            "throughput": 3544,
+            "latency": 1204,
+            "errorRate": 68,
+            "saturation": 100
+          },
+          {
+            "minute": 8,
+            "demand": 3940,
+            "throughput": 3544,
+            "latency": 253,
+            "errorRate": 16.8,
+            "saturation": 100
+          },
+          {
+            "minute": 9,
+            "demand": 2200,
+            "throughput": 2200,
+            "latency": 94,
+            "errorRate": 0.05,
+            "saturation": 62
+          },
+          {
+            "minute": 10,
+            "demand": 2006,
+            "throughput": 2006,
+            "latency": 82,
+            "errorRate": 0.05,
+            "saturation": 57
+          }
+        ],
+        "nodeMetrics": [
+          {
+            "id": "db",
+            "label": "Banco transacional",
+            "kind": "database",
+            "trafficShare": 84.6,
+            "peakUtilization": 213
+          },
+          {
+            "id": "api",
+            "label": "API stateless",
+            "kind": "service",
+            "trafficShare": 92,
+            "peakUtilization": 13
+          },
+          {
+            "id": "gateway",
+            "label": "Entrada HTTPS",
+            "kind": "gateway",
+            "trafficShare": 100,
+            "peakUtilization": 8
+          },
+          {
+            "id": "users",
+            "label": "Usuários",
+            "kind": "client",
+            "trafficShare": 100,
+            "peakUtilization": 4
+          }
+        ],
+        "recommendations": [
+          "Aumente capacidade ou réplicas de Banco transacional.",
+          "Reduza chamadas síncronas no caminho crítico ou introduza cache/batching."
+        ]
+      }
+    ],
+    "live": {
+      "generated": 10000,
+      "completed": 7350,
+      "failed": 0,
+      "pending": 2649.999999999998,
+      "finished": true,
+      "seconds": 150
+    }
+  },
+  {
+    "lab": 3,
+    "name": "Santa Cecília | Lab 03 | Capacidade no gargalo",
+    "nodes": 4,
+    "edges": 3,
+    "simulations": [
+      {
+        "pattern": "steady",
+        "stable": true,
+        "demand": 2000,
+        "throughput": 2000,
+        "latency": 48,
+        "errorRate": 0.05,
+        "saturation": 8,
+        "bottleneckId": "db",
+        "bottleneckLabel": "Banco transacional",
+        "duration": 10,
+        "availability": 99.99,
+        "recoveryMinutes": 0,
+        "finalThroughput": 2000,
+        "capacityGap": 0,
+        "overloadedNodes": 0,
+        "timeline": [
+          {
+            "minute": 0,
+            "demand": 2000,
+            "throughput": 2000,
+            "latency": 48,
+            "errorRate": 0.05,
+            "saturation": 8
+          },
+          {
+            "minute": 1,
+            "demand": 2000,
+            "throughput": 2000,
+            "latency": 48,
+            "errorRate": 0.05,
+            "saturation": 8
+          },
+          {
+            "minute": 3,
+            "demand": 2000,
+            "throughput": 2000,
+            "latency": 48,
+            "errorRate": 0.05,
+            "saturation": 8
+          },
+          {
+            "minute": 4,
+            "demand": 2000,
+            "throughput": 2000,
+            "latency": 48,
+            "errorRate": 0.05,
+            "saturation": 8
+          },
+          {
+            "minute": 5,
+            "demand": 2000,
+            "throughput": 2000,
+            "latency": 48,
+            "errorRate": 0.05,
+            "saturation": 8
+          },
+          {
+            "minute": 6,
+            "demand": 2000,
+            "throughput": 2000,
+            "latency": 48,
+            "errorRate": 0.05,
+            "saturation": 8
+          },
+          {
+            "minute": 8,
+            "demand": 2000,
+            "throughput": 2000,
+            "latency": 48,
+            "errorRate": 0.05,
+            "saturation": 8
+          },
+          {
+            "minute": 9,
+            "demand": 2000,
+            "throughput": 2000,
+            "latency": 48,
+            "errorRate": 0.05,
+            "saturation": 8
+          },
+          {
+            "minute": 10,
+            "demand": 2000,
+            "throughput": 2000,
+            "latency": 48,
+            "errorRate": 0.05,
+            "saturation": 8
+          }
+        ],
+        "nodeMetrics": [
+          {
+            "id": "db",
+            "label": "Banco transacional",
+            "kind": "database",
+            "trafficShare": 84.6,
+            "peakUtilization": 8
+          },
+          {
+            "id": "api",
+            "label": "API stateless",
+            "kind": "service",
+            "trafficShare": 92,
+            "peakUtilization": 3
+          },
+          {
+            "id": "gateway",
+            "label": "Entrada HTTPS",
+            "kind": "gateway",
+            "trafficShare": 100,
+            "peakUtilization": 2
+          },
+          {
+            "id": "users",
+            "label": "Usuários",
+            "kind": "client",
+            "trafficShare": 100,
+            "peakUtilization": 1
+          }
+        ],
+        "recommendations": [
+          "Há folga no cenário; valide agora um pico maior ou injete a falha de um componente."
+        ]
+      },
+      {
+        "pattern": "spike",
+        "stable": true,
+        "demand": 7544,
+        "throughput": 7544,
+        "latency": 48,
+        "errorRate": 0.05,
+        "saturation": 32,
+        "bottleneckId": "db",
+        "bottleneckLabel": "Banco transacional",
+        "duration": 10,
+        "availability": 99.99,
+        "recoveryMinutes": 0,
+        "finalThroughput": 2006,
+        "capacityGap": 0,
+        "overloadedNodes": 0,
+        "timeline": [
+          {
+            "minute": 0,
+            "demand": 2000,
+            "throughput": 2000,
+            "latency": 48,
+            "errorRate": 0.05,
+            "saturation": 8
+          },
+          {
+            "minute": 1,
+            "demand": 2002,
+            "throughput": 2002,
+            "latency": 48,
+            "errorRate": 0.05,
+            "saturation": 8
+          },
+          {
+            "minute": 3,
+            "demand": 2085,
+            "throughput": 2085,
+            "latency": 48,
+            "errorRate": 0.05,
+            "saturation": 9
+          },
+          {
+            "minute": 4,
+            "demand": 3162,
+            "throughput": 3162,
+            "latency": 48,
+            "errorRate": 0.05,
+            "saturation": 13
+          },
+          {
+            "minute": 5,
+            "demand": 6673,
+            "throughput": 6673,
+            "latency": 48,
+            "errorRate": 0.05,
+            "saturation": 28
+          },
+          {
+            "minute": 6,
+            "demand": 7544,
+            "throughput": 7544,
+            "latency": 48,
+            "errorRate": 0.05,
+            "saturation": 32
+          },
+          {
+            "minute": 8,
+            "demand": 3940,
+            "throughput": 3940,
+            "latency": 48,
+            "errorRate": 0.05,
+            "saturation": 17
+          },
+          {
+            "minute": 9,
+            "demand": 2200,
+            "throughput": 2200,
+            "latency": 48,
+            "errorRate": 0.05,
+            "saturation": 9
+          },
+          {
+            "minute": 10,
+            "demand": 2006,
+            "throughput": 2006,
+            "latency": 48,
+            "errorRate": 0.05,
+            "saturation": 8
+          }
+        ],
+        "nodeMetrics": [
+          {
+            "id": "db",
+            "label": "Banco transacional",
+            "kind": "database",
+            "trafficShare": 84.6,
+            "peakUtilization": 32
+          },
+          {
+            "id": "api",
+            "label": "API stateless",
+            "kind": "service",
+            "trafficShare": 92,
+            "peakUtilization": 13
+          },
+          {
+            "id": "gateway",
+            "label": "Entrada HTTPS",
+            "kind": "gateway",
+            "trafficShare": 100,
+            "peakUtilization": 8
+          },
+          {
+            "id": "users",
+            "label": "Usuários",
+            "kind": "client",
+            "trafficShare": 100,
+            "peakUtilization": 4
+          }
+        ],
+        "recommendations": [
+          "Há folga no cenário; valide agora um pico maior ou injete a falha de um componente."
+        ]
+      }
+    ],
+    "live": {
+      "generated": 10000,
+      "completed": 10000,
+      "failed": 0,
+      "pending": 0,
+      "finished": true,
+      "seconds": 33
+    }
+  }
+]

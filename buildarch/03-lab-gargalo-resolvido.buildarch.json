@@ -1,0 +1,168 @@
+{
+  "id": "santa-cecilia-lab-3",
+  "name": "Santa Cecília | Lab 03 | Capacidade no gargalo",
+  "description": "Demonstração controlada. Base 2.000 req/min e pico 10x. Carga ao vivo: 200 usuários x 10 ações/min ou 2.000 x 10. Cadeia linear evita divisão de tráfego. Modelo didático, sem benchmark real.",
+  "category": "software",
+  "status": "review",
+  "version": 1,
+  "nodes": [
+    {
+      "id": "users",
+      "type": "architecture",
+      "position": {
+        "x": 0,
+        "y": 150
+      },
+      "data": {
+        "instances": 1,
+        "capacity": 200000,
+        "currentLoad": 2000,
+        "latency": 10,
+        "availability": 100,
+        "monthlyCost": 0,
+        "cpu": 30,
+        "memory": 30,
+        "storage": 2,
+        "replicas": 1,
+        "label": "Usuários",
+        "kind": "client",
+        "description": "Laboratório com caminho único para isolar capacidade. 100% de disponibilidade é premissa matemática para isolar falha injetada, não SLA de produção.",
+        "technology": "Gerador virtual",
+        "deployment": {}
+      }
+    },
+    {
+      "id": "gateway",
+      "type": "architecture",
+      "position": {
+        "x": 340,
+        "y": 150
+      },
+      "data": {
+        "instances": 2,
+        "capacity": 100000,
+        "currentLoad": 2000,
+        "latency": 10,
+        "availability": 100,
+        "monthlyCost": 0,
+        "cpu": 30,
+        "memory": 30,
+        "storage": 1,
+        "replicas": 2,
+        "label": "Entrada HTTPS",
+        "kind": "gateway",
+        "description": "Laboratório com caminho único para isolar capacidade. 100% de disponibilidade é premissa matemática para isolar falha injetada, não SLA de produção.",
+        "technology": "Load Balancer",
+        "deployment": {}
+      }
+    },
+    {
+      "id": "api",
+      "type": "architecture",
+      "position": {
+        "x": 680,
+        "y": 150
+      },
+      "data": {
+        "instances": 6,
+        "capacity": 18000,
+        "currentLoad": 2000,
+        "latency": 10,
+        "availability": 100,
+        "monthlyCost": 0,
+        "cpu": 30,
+        "memory": 30,
+        "storage": 8,
+        "replicas": 6,
+        "label": "API stateless",
+        "kind": "service",
+        "description": "Laboratório com caminho único para isolar capacidade. 100% de disponibilidade é premissa matemática para isolar falha injetada, não SLA de produção.",
+        "technology": "Node.js",
+        "deployment": {}
+      }
+    },
+    {
+      "id": "db",
+      "type": "architecture",
+      "position": {
+        "x": 1020,
+        "y": 150
+      },
+      "data": {
+        "instances": 1,
+        "capacity": 20000,
+        "currentLoad": 1500,
+        "latency": 10,
+        "availability": 100,
+        "monthlyCost": 0,
+        "cpu": 30,
+        "memory": 30,
+        "storage": 42,
+        "replicas": 2,
+        "label": "Banco transacional",
+        "kind": "database",
+        "description": "Laboratório com caminho único para isolar capacidade. 100% de disponibilidade é premissa matemática para isolar falha injetada, não SLA de produção.",
+        "technology": "PostgreSQL",
+        "deployment": {}
+      }
+    }
+  ],
+  "edges": [
+    {
+      "id": "users-gateway",
+      "source": "users",
+      "target": "gateway",
+      "type": "smoothstep",
+      "animated": false,
+      "data": {
+        "protocol": "HTTPS",
+        "latency": 10,
+        "asynchronous": false,
+        "evidence": "Modelo didático da palestra; relação lógica revisada manualmente.",
+        "inferred": false
+      }
+    },
+    {
+      "id": "gateway-api",
+      "source": "gateway",
+      "target": "api",
+      "type": "smoothstep",
+      "animated": false,
+      "data": {
+        "protocol": "HTTPS",
+        "latency": 10,
+        "asynchronous": false,
+        "evidence": "Modelo didático da palestra; relação lógica revisada manualmente.",
+        "inferred": false
+      }
+    },
+    {
+      "id": "api-db",
+      "source": "api",
+      "target": "db",
+      "type": "smoothstep",
+      "animated": false,
+      "data": {
+        "protocol": "SQL/TLS",
+        "latency": 10,
+        "asynchronous": false,
+        "evidence": "Modelo didático da palestra; relação lógica revisada manualmente.",
+        "inferred": false
+      }
+    }
+  ],
+  "updatedAt": "2026-10-06T23:48:49.728Z",
+  "infrastructure": {
+    "hosts": 3,
+    "cpuPerHost": 4,
+    "memoryPerHost": 8192,
+    "failedHosts": 0,
+    "demand": 12000,
+    "bandwidthMbps": 100,
+    "payloadKB": 64,
+    "latencyMs": 10,
+    "packetLoss": 0
+  },
+  "revisions": [],
+  "revisionDirty": false
+}
