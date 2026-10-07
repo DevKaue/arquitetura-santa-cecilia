@@ -1,7 +1,7 @@
 # Arquitetura Santa Cecília
 ## Perguntas e respostas para discussão
 
-Usar a **resposta breve** durante a palestra. O **aprofundamento** serve para perguntas adicionais, sem interromper o fluxo da demonstração.
+Reservar cerca de **4 minutos** da palestra de 40 minutos para perguntas. Usar a **resposta breve**; manter o aprofundamento como apoio para conversa posterior. Priorizar as perguntas 2 (gargalo), 5 (estoque) e 14 (inferência), conforme a plateia. A demonstração principal tem 10 minutos e não precisa cobrir este caderno inteiro.
 
 ### A. Escolha e evolução da arquitetura
 
@@ -108,3 +108,11 @@ Usar a **resposta breve** durante a palestra. O **aprofundamento** serve para pe
 **Resposta breve:** publica o exemplo arquitetural, manifests e endpoints demonstrativos.
 
 **Aprofundamento:** o catálogo é sintético, checkout retorna 501 e relay/worker não processam eventos. O schema explicita invariantes; o comportamento de domínio está descrito nas notas técnicas. O objetivo ao importar do GitHub é revisar evidências de arquitetura.
+
+### F. Visão de apresentação
+
+#### 17. Onde estão os outros componentes do mapa completo?
+
+**Resposta breve:** a visão v10 agrupa as réplicas e mostra três jornadas; o mapa detalhado permanece na v9.
+
+**Aprofundamento:** DNS, identidade, observabilidade, CI/CD e recuperação não foram descartados da arquitetura. Estão na revisão completa e nas notas técnicas. A simplificação serve para apresentar decisões em poucos minutos, sem misturar todas as relações de dados, controle e operação.

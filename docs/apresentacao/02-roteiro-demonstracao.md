@@ -1,141 +1,100 @@
 # Arquitetura Santa Cecília
-## Roteiro da demonstração no Build Arch
+## Roteiro enxuto da demonstração
 
-**Duração:** 25 minutos. **Formato:** demonstração guiada, com importação por URL do GitHub no roteiro principal.  
-**Resultado esperado:** a plateia explica por que a arquitetura evolui e por que escalar a API pode manter o mesmo gargalo.
+**Palestra completa: 40 minutos. Demonstração no Build Arch: 10 minutos.** Se o tempo apertar, usar a versão de 5 minutos ao fim deste roteiro. O foco é conectar as decisões dos slides ao desenho; a configuração da ferramenta fica pronta no ensaio.
 
-### Preparação do apresentador
+### Distribuição sugerida dos 40 minutos
 
-1. Abrir **Arquitetura Santa Cecília** no Build Arch Desktop, em **Trabalho atual · v9**. Conferir **Salvo agora** e o enquadramento do canvas.
-2. Conferir os projetos **Santa Cecília | Lab 01 | Inicial: banco limita**, **Santa Cecília | Lab 02 | Escalar a API não resolve** e **Santa Cecília | Lab 03 | Capacidade no gargalo**.
-3. Deixar disponível a URL **https://github.com/DevKaue/arquitetura-santa-cecilia** e a referência **main**.
-4. Ensaiar uma importação pelo painel **Analisar projeto**, usando **GitHub público**. A demonstração usa essa URL; backups ficam como recuperação do material.
-5. Abrir o cartão do apresentador. Não alterar blocos durante uma execução de carga: a edição limpa a execução.
-
-### Visão do tempo
-
-| Minutos | Etapa | Mensagem |
-|---|---|---|
-| 0–2 | Problema | Leitura e compra têm exigências diferentes |
-| 2–6 | Evolução do desenho | Cada componente responde a uma necessidade |
-| 6–9 | Compra e pós-compra | Transação local e integração externa exigem controles distintos |
-| 9–15 | Três laboratórios | Mais APIs não corrigem um banco limitante |
-| 15–18 | Pico 10x | Pendência mostra acúmulo de trabalho |
-| 18–22 | Importar do GitHub | Código produz evidências; arquitetura exige revisão |
-| 22–25 | Falha, decisão e exportação | Medir, conter impacto e registrar a decisão |
-
-### 0:00–2:00 — Abrir o problema
-
-**Ação no Desktop:** mostrar o projeto completo em 2D e apontar usuários, catálogo e checkout. Relacionar com os slides 3–4.
-
-**Fala sugerida:** “A maioria das pessoas consulta produtos. Uma parte menor compra, mas uma compra sem estoque ou uma cobrança duplicada custa muito mais caro. Vamos acompanhar o que pode aceitar atraso e o que exige uma decisão confiável.”
-
-**Mostrar:** 2.000 req/min normal, 20.000 no pico e perfil 95/5. Explicar que são premissas do exercício. Perguntar: “Qual dependência vocês investigariam primeiro durante o pico?”
-
-**Transição:** “A arquitetura cresce quando aparece uma necessidade. Vamos ver a sequência.”
-
-### 2:00–6:00 — Percorrer a evolução
-
-**Ação no Desktop:** usar **Versão da arquitetura** para mostrar brevemente as etapas anteriores; retornar a **Trabalho atual · v9**. Relacionar com os slides 13–19.
-
-| Apontar | Explicação principal |
+| Tempo da palestra | Conteúdo |
 |---|---|
-| DNS e CDN/WAF | DNS resolve o destino; CDN aproxima conteúdo público; WAF reduz ataques na borda |
-| Load Balancer e APIs | Entrada distribui chamadas; instâncias stateless podem crescer |
-| Redis e réplicas A/B | HIT responde pelo cache; MISS escolhe uma réplica; leitura pode atrasar |
-| Principal + standby | Existe um writer; standby protege contra falha, sem duplicar escrita |
-| Outbox, relay, fila e worker | Trabalho posterior à compra segue por entrega assíncrona |
-| Observabilidade, CI/CD e DR | Métricas orientam operação; entrega gradual contém regressão; recuperação precisa de ensaio |
+| 0–5 min | Problema, contexto e premissas |
+| 5–15 min | Escalabilidade, consistência e resiliência |
+| 15–23 min | Evolução da arquitetura, segurança e operação |
+| 23–33 min | Demonstração de 10 min no Build Arch |
+| 33–36 min | Decisões finais e conclusão |
+| 36–40 min | Perguntas |
 
-**Fala sugerida:** “As caixas mostram responsabilidades. Começar com um monólito modular pode ser adequado; separar implantação passa a fazer sentido quando volume, equipe e isolamento de falhas justificam o custo.”
+### Preparação antes de entrar em cena
 
-**Atenção:** DNS, replicação, telemetria e deploy são relações lógicas. O mapa completo não deve ser usado como uma cadeia de processamento de cada requisição. Custo e disponibilidade do painel usam hipóteses.
+Abrir **Arquitetura Santa Cecília**, em **Trabalho atual · v10**, e enquadrar o mapa. A visão compacta tem três jornadas. O desenho completo de 19 blocos/25 relações está preservado na **v9**; não é necessário percorrer o histórico durante a apresentação.
 
-### 6:00–9:00 — Explicar a compra correta
+Ensaiar a importação de **https://github.com/DevKaue/arquitetura-santa-cecilia**, referência **main**. Deixar os Labs 01 e 03 conferidos com os parâmetros do cartão. Conferir **Salvo agora**. Não montar caixas, schema ou conexões ao vivo.
 
-**Ação no Desktop:** apontar **06 API Checkout**, **10 Principal + standby**, **18 Publicador da outbox**, **11 Eventos pós-compra**, **12 Worker notificações** e **19 Mensagens para análise**. Abrir **Modelagem de dados** no banco principal.
+### Sequência principal: 10 minutos
 
-**Sequência para explicar:**
-
-1. Validar identidade e autorizar o dono do pedido. Conferir chave de idempotência e hash da solicitação.
-2. Reservar estoque com atualização condicional; gravar pedido, itens e evento de outbox na mesma transação.
-3. Fazer commit. Chamar pagamento externo com idempotência, fora da transação SQL.
-4. Reconciliar a confirmação. Em nova transação, confirmar a compra e gravar o evento `purchase_confirmed`.
-5. O relay publica após commit, aguarda confirmação do broker e marca a publicação. Uma queda entre publicação e marcação pode gerar duplicata.
-6. O consumidor controla o efeito pelo evento e confirma a mensagem após o resultado durável. Tentativas esgotadas vão para a DLQ, com análise e reprocessamento controlado.
-
-**Mostrar no schema:** `orders.owner_subject`, `idempotency_key`, `request_hash`; `reservations.expires_at`; `outbox`; chave composta de `processed_events`.
-
-**Fala sugerida:** “A tela pode exibir estoque atrasado. A decisão de reservar precisa vencer a concorrência no writer. A outbox mantém o pedido e a intenção de publicar juntos; a entrega ainda pode repetir.”
-
-### 9:00–15:00 — Comparar os três laboratórios
-
-**Configuração comum:** **Simular arquitetura** → carga inicial **2.000 req/min** → perfil **Pico** → **4,0x** → duração **10 min** → **Nenhuma falha** → **Executar simulação**. A duração é virtual.
-
-| Projeto | Ação | O que interpretar |
+| Tempo da demo | Mostrar | Mensagem |
 |---|---|---|
-| Lab 01 | Executar e apontar o primeiro gargalo | Banco transacional limita o fluxo |
-| Lab 02 | Repetir sem mudar os parâmetros | API cresce de 1 para 6 instâncias; banco continua igual |
-| Lab 03 | Repetir novamente | Capacidade cadastrada do banco aumenta; o limitador recebe a mudança |
+| 0:00–1:00 | Visão geral | Leitura e compra têm necessidades diferentes |
+| 1:00–4:00 | Três jornadas | Cache para leitura; writer para reserva; fila para pós-compra |
+| 4:00–6:00 | Importar URL do GitHub | Código oferece evidências para revisão |
+| 6:00–9:00 | Labs 01 e 03 | Investir no gargalo muda o resultado |
+| 9:00–10:00 | Voltar ao mapa e concluir | Medir e validar as decisões no sistema real |
 
-| Resultado do mesmo pico | Lab 01 | Lab 02 | Lab 03 |
-|---|---:|---:|---:|
-| Instâncias de API | 1 | 6 | 6 |
-| Capacidade do banco, req/min | 3.000 | 3.000 | 20.000 |
-| Latência estimada, ms | 895 | 895 | 48 |
-| Erro estimado | 68% | 68% | 0,05% |
+### 0:00–1:00 — Retomar o caso
 
-**Fala sugerida:** “Mais cópias da API continuam chegando ao mesmo banco. Primeiro medimos o limitador; depois decidimos entre otimizar queries e índices, controlar concorrência ou aumentar a capacidade necessária.”
+**Ação:** mostrar a visão compacta, já aberta em 2D.
 
-**Limite a declarar uma vez:** latência e erro são heurísticas do Build Arch. O Lab 03 representa uma capacidade informada; não prova que adicionar réplica de leitura acelera escrita.
+**Fala:** “Este desenho reúne o caso dos slides. A consulta ao catálogo pode aceitar algum atraso. A compra precisa reservar estoque e evitar repetição de cobrança. O que vem depois da compra pode sair do tempo de resposta.”
 
-### 15:00–18:00 — Mostrar a campanha 10x
+Retomar 95% leitura/5% escrita e pico 10x em uma frase. As premissas já foram explicadas nos slides.
 
-**Ação no Desktop:** no Lab 01, abrir **Teste de carga ao vivo**. Usar entrada **Usuários**, **200 usuários**, **10 ações/min**, **30 segundos**, sem falha. Iniciar e mostrar a base de 2.000 req/min.
+### 1:00–4:00 — Explicar três jornadas
 
-Limpar a execução. Mudar apenas para **2.000 usuários**, mantendo **10 ações/min** e **30 s**: são 20.000 req/min. Mostrar a fila no banco. No Lab 03, repetir o pico com os mesmos valores.
+**Leitura:** apontar **Catálogo → Cache / Réplicas de leitura**. HIT responde pelo cache; MISS consulta uma réplica. As duas réplicas estão agrupadas para a apresentação.
 
-**Resultado:** 10.000 requisições são geradas. Labs 01/02 deixam aproximadamente 2.650 pendentes após a drenagem máxima; Lab 03 conclui sem pendências em 33 segundos virtuais. Pendência é acúmulo de trabalho, não comprovação de perda de pedido.
+**Compra:** apontar **Checkout → Writer + standby / Pagamento externo**. Autorização do dono, idempotência e reserva concorrente no writer. A integração de pagamento ocorre fora da transação SQL; timeout exige reconciliação.
 
-**Fala sugerida:** “A fila mostra que a entrada está maior que a capacidade de processamento. Escalar precisa respeitar o banco e o orçamento.”
+**Pós-compra:** apontar **Publicador da outbox → Fila → Notificações / DLQ**. Pedido e intenção de evento são gravados juntos. A notificação de compra confirmada depende de pagamento reconciliado; a entrega pode repetir, por isso o consumidor controla duplicatas.
 
-**Limite do motor:** o temporal permite até 4x; a carga ao vivo demonstra 10x pelos usuários. Os motores têm cálculos diferentes. Ramificações da carga ao vivo dividem tráfego igualmente; por isso usamos os Labs lineares.
+**Fala:** “Cada caminho tem uma exigência. Distribuímos leitura, protegemos a decisão de compra e deixamos tarefas posteriores em uma fila.”
 
-### 18:00–22:00 — Importar a arquitetura do GitHub
+Mencionar em uma frase que identidade, observabilidade, CI/CD e recuperação também fazem parte da arquitetura e estão detalhadas na v9 e nas notas. Não abrir a modelagem de dados nesta sequência.
 
-**URL:** https://github.com/DevKaue/arquitetura-santa-cecilia  
-**Referência:** main
+### 4:00–6:00 — Trazer a arquitetura do GitHub
 
-1. Abrir **Analisar projeto** no Desktop e selecionar **GitHub público**.
-2. Colar a URL raiz do repositório. Informar **main** no campo de referência, se exibido.
-3. Executar a análise. Mostrar as evidências de `docker-compose.yml`, redes, volume e Dockerfiles.
-4. Apontar o relay dependendo de PostgreSQL e RabbitMQ, e o checkout dependendo do PostgreSQL.
-5. Abrir a arquitetura gerada como outro projeto. Comparar com o desenho revisado e retornar à **Arquitetura Santa Cecília**.
+**Ação:** **Analisar projeto → GitHub público**. Colar **https://github.com/DevKaue/arquitetura-santa-cecilia**, referência **main**, executar e mostrar o rascunho/evidências. Não editar o mapa inferido durante a palestra.
 
-**Fala sugerida:** “O repositório revela serviços e dependências declaradas. Precisamos conferir se cada relação é inicialização, comunicação ou uma hipótese. O código ajuda a começar; a decisão de arquitetura vem da revisão.”
+**Fala:** “O repositório já declara serviços, redes e dependências. A ferramenta extrai evidências, mas precisamos conferir se a relação é inicialização, comunicação ou uma hipótese.”
 
-**Resultado verificado pelo motor:** nove serviços do Compose geraram 23 blocos e 22 relações. O mapa inclui redes, imagens, volume e abstrações de software; não representa 23 microsserviços. `depends_on` não prova uma chamada de negócio nem garante prontidão sem uma condição adequada.
+Aponte apenas um exemplo: o relay depende de PostgreSQL e RabbitMQ. O resultado verificado contém 23 blocos/22 relações para nove serviços do Compose, incluindo imagens, redes e volume. Não significa 23 microsserviços.
 
-**Se a rede falhar:** usar os backups para continuar a explicação e mostrar as evidências registradas em `docs/validacao/inferencia-verificada.json`. Deixar claro que a importação por URL não foi realizada naquele momento; retomar o teste após restabelecer a rede.
+Se a análise demorar mais de 45 segundos, continuar a explicação no mapa principal, sem ficar aguardando em silêncio. Se a Internet falhar, mostrar a evidência publicada e esclarecer que a importação ao vivo não terminou.
 
-### 22:00–25:00 — Falha, decisão e registro
+### 6:00–9:00 — Uma comparação de gargalo
 
-**Ação no Desktop:** no Lab 03, injetar falha do **Banco transacional**. Explicar que o controle derruba o bloco inteiro; não testa failover de uma réplica PostgreSQL. Retornar ao mapa completo.
+**Ação:** mostrar o resultado do **Lab 01** e do **Lab 03**, com o mesmo cenário ensaiado. Parâmetros: **2.000 req/min**, **Pico**, **4x**, **10 min virtuais**, **Nenhuma falha**. Executar somente se os controles já estiverem prontos; se faltar tempo, usar a tabela do cartão.
 
-Discutir brevemente pagamento lento, retry limitado, DLQ e recuperação. O catálogo pode continuar quando uma integração de pagamento está indisponível. Timeout externo mantém resultado desconhecido até consulta ou reconciliação. RPO ≤ 5 min e RTO ≤ 30 min são metas propostas, que exigem ensaio.
+| Resultado do modelo | Lab 01 | Lab 03 |
+|---|---:|---:|
+| Capacidade cadastrada do banco, req/min | 3.000 | 20.000 |
+| Latência estimada, ms | 895 | 48 |
+| Erro estimado | 68% | 0,05% |
 
-**Fechamento sugerido:** “Cada decisão resolve um problema e traz um custo. O próximo passo é medir o sistema real, testar concorrência e falhas e confirmar se as premissas atendem ao negócio.”
+**Fala:** “Mais APIs continuam chegando ao mesmo banco. O Lab 02, que fica como apoio, demonstra isso. A melhoria precisa atingir o limitador, com otimização ou capacidade medida.”
 
-Mostrar **Arquivo → Salvar backup**. Uma nova decisão merece revisão e exportação; os arquivos publicados em `buildarch/` permitem abrir o material em outra máquina.
+Declarar uma vez: “Esses números são saídas do modelo, não medições de produção.” Não repetir o Lab 02 nem fazer carga ao vivo, falha injetada ou passeio em 3D nesta sequência.
 
-### Adaptação para 20 ou 30 minutos
+### 9:00–10:00 — Fechar e retornar aos slides
 
-**20 min:** reduzir evolução do mapa para 3 min; comparar configuração do Lab 02 sem repetir a execução inteira; explicar apenas quatro tabelas na compra. Manter a importação do GitHub e os dois cenários de carga principais.
+**Ação:** retornar à **Arquitetura Santa Cecília**.
 
-**30 min:** manter o roteiro de 25 min e reservar 5 min para perguntas sobre idempotência, consistência, redundância e recuperação. Usar o caderno de perguntas como apoio.
+**Fala:** “O desenho organiza as responsabilidades; o repositório ajuda a encontrar evidências; as métricas ajudam a testar hipóteses. O próximo passo real é validar concorrência, segurança, capacidade e recuperação.”
 
-### Ensaio e limites do diagnóstico
+Mencionar que o backup e o repositório guardam as decisões. Retornar à conclusão da palestra. Exportação e navegação de histórico ficam para depois.
 
-O diagnóstico pode apontar redundância insuficiente em cada réplica A/B isolada. A redundância de leitura depende do conjunto e da seleção de destino saudável pela API. Explique o limite da heurística. Não use pontuação do painel como certificação de segurança, disponibilidade ou custo.
+### Plano de 5 minutos se o tempo apertar
 
-Ensaie com a versão instalada do Desktop, confira o resultado da importação da URL e os parâmetros dos Labs. Após alterações, aguarde **Salvo agora**. O código de referência usa dados sintéticos; o schema e o mapa descrevem controles que precisam de implementação e teste em um sistema real.
+| Tempo | Ação |
+|---|---|
+| 0–1 min | Apresentar a visão geral |
+| 1–3 min | Explicar leitura, compra e pós-compra |
+| 3–4:30 min | Importar do GitHub e apontar uma evidência |
+| 4:30–5 min | Concluir e retornar aos slides |
+
+Sem simulação ao vivo. A comparação dos Labs fica em uma resposta à plateia ou no material de apoio. Se a rede não colaborar, manter o mapa já aberto e seguir o fechamento.
+
+### Material mantido para ensaio e perguntas
+
+Os três Labs, o schema de oito tabelas, os relatórios de carga/inferência, as notas técnicas e o mapa completo da v9 continuam nos mesmos arquivos. A carga ao vivo 10x usa 2.000 usuários × 10 ações/min por 30 s; Labs 01/02 deixam aproximadamente 2.650 pendentes após drenagem, e Lab 03 termina sem pendências. Esse exercício fica fora da demo principal.
+
+O diagnóstico e os motores usam heurísticas. A visão compacta agrupa componentes e omite relações de controle/operação para facilitar a leitura; não representa a implantação completa nem um fluxo exato de simulação.

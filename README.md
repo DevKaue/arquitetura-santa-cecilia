@@ -13,14 +13,14 @@ Repositório: https://github.com/DevKaue/arquitetura-santa-cecilia
 Referência:  main
 ```
 
-Executar a análise, revisar evidências e abrir o rascunho gerado. O Compose descreve nove serviços, redes e volume. A inferência verificada identificou 23 blocos e 22 relações; esse mapa inclui imagens e abstrações de software. O desenho revisado em [buildarch/](buildarch/) tem 19 blocos, 25 relações e nove revisões.
+Executar a análise, revisar evidências e abrir o rascunho gerado. O Compose descreve nove serviços, redes e volume. A inferência verificada identificou 23 blocos e 22 relações; esse mapa inclui imagens e abstrações de software. O desenho revisado em [buildarch/](buildarch/) tem uma visão compacta v10 com 13 blocos/13 relações; o mapa completo de 19 blocos/25 relações está preservado na v9.
 
 ## Navegação
 
 | Material | Uso |
 |---|---|
 | [Resumo executivo](docs/apresentacao/01-resumo-executivo.md) | Revisar decisões e alinhar os slides |
-| [Roteiro de 25 minutos](docs/apresentacao/02-roteiro-demonstracao.md) | Conduzir a demonstração e importar do GitHub |
+| [Roteiro de 10 minutos](docs/apresentacao/02-roteiro-demonstracao.md) | Conduzir a demonstração e importar do GitHub |
 | [Cartão do apresentador](docs/apresentacao/03-cartao-apresentador.md) | Consultar parâmetros e sequência durante o ensaio |
 | [Perguntas e respostas](docs/apresentacao/04-perguntas-respostas.md) | Apoiar a discussão com a plateia |
 | [Guia da palestra em PDF](docs/apresentacao/guia-da-palestra.pdf) | Enviar para revisão e consultar o material diagramado |

@@ -2,7 +2,7 @@
 
 | Backup | Conteúdo |
 |---|---|
-| [00 · Arquitetura Santa Cecília](00-arquitetura-santa-cecilia.buildarch.json) | Mapa revisado v9; 19 blocos, 25 relações, oito tabelas |
+| [00 · Arquitetura Santa Cecília](00-arquitetura-santa-cecilia.buildarch.json) | Visão compacta v10; 13 blocos/13 relações; mapa completo v9 mantido no histórico; oito tabelas |
 | [01 · Banco limita](01-lab-inicial.buildarch.json) | Uma instância de API; capacidade de banco 3.000 req/min |
 | [02 · Mais APIs](02-lab-escala-api.buildarch.json) | Seis instâncias de API; mesmo banco |
 | [03 · Capacidade no gargalo](03-lab-gargalo-resolvido.buildarch.json) | Seis APIs; capacidade de banco 20.000 req/min |

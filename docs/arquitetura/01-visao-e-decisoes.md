@@ -49,3 +49,7 @@ DNS, identidade, observabilidade, CI/CD e DR aparecem no backup completo como re
 Bancos/cache/broker privados; autorização por pedido; segredos fora do código/log; menor privilégio; timeout/retry finitos. Métricas: p95/p99 medidos, erro, saturação, cache HIT, atraso de réplica, idade da fila/outbox/DLQ e pagamentos pendentes. Canary usa métricas; migrações compatíveis e rollback exigem revisão do estado dos dados.
 
 Referências: [PostgreSQL — isolamento](https://www.postgresql.org/docs/current/transaction-iso.html), [PostgreSQL — standby](https://www.postgresql.org/docs/current/warm-standby.html), [RabbitMQ — confirmações e ACK](https://www.rabbitmq.com/docs/confirms).
+
+## Visão para a palestra de 40 minutos
+
+A v10 oferece um mapa de apresentação com leitura, compra e pós-compra (13 blocos/13 relações). As réplicas A/B foram agrupadas. O detalhamento completo permanece na v9 (19 blocos/25 relações); DNS, identidade, operação e DR continuam válidos. O roteiro reserva 10 minutos para demonstrar, com plano de 5 minutos. Todos os arquivos e Labs foram mantidos.

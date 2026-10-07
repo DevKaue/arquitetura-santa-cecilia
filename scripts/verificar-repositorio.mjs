@@ -24,10 +24,14 @@ for (const file of files) {
   for (const revision of project.revisions ?? []) verifyGraph(revision);
   if (file.startsWith('00-')) {
     assert.equal(project.name, 'Arquitetura Santa Cecília');
-    assert.equal(project.version, 9);
-    assert.equal(project.nodes.length, 19);
-    assert.equal(project.edges.length, 25);
-    assert.equal(project.revisions.length, 9);
+    assert.equal(project.version, 10);
+    assert.equal(project.nodes.length, 13);
+    assert.equal(project.edges.length, 13);
+    assert.equal(project.revisions.length, 10);
+    const full = project.revisions.find((revision) => revision.version === 9);
+    assert.equal(full.nodes.length, 19, 'O mapa completo deve permanecer no histórico.');
+    assert.equal(full.edges.length, 25);
+    assert.equal(project.nodes.find((node) => node.id === 'read1').data.instances, 2);
     const tables = project.nodes.find((node) => node.id === 'primary').data.schema.tables;
     assert.equal(tables.length, 8);
     const byId = new Map(tables.map((table) => [table.id, table]));
