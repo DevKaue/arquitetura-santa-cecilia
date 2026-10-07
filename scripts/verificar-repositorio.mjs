@@ -24,10 +24,18 @@ for (const file of files) {
   for (const revision of project.revisions ?? []) verifyGraph(revision);
   if (file.startsWith('00-')) {
     assert.equal(project.name, 'Arquitetura Santa Cecília');
-    assert.equal(project.version, 19);
+    assert.equal(project.version, 21);
     assert.equal(project.nodes.length, 23);
     assert.equal(project.edges.length, 40);
-    assert.equal(project.revisions.length, 19);
+    assert.equal(project.revisions.length, 21);
+    const linear = JSON.parse(read('docs/validacao/layout-linear.json'));
+    assert.deepEqual(project.nodes.map((node) => node.id), linear.nodeOrder);
+    assert.ok(project.nodes.every((node) => node.position.y === 0));
+    for (let i = 0; i < project.nodes.length; i++) {
+      assert.ok(project.nodes[i].data.label.startsWith(String(i + 1).padStart(2, '0') + ' '));
+      if (i) assert.ok(project.nodes[i].position.x - project.nodes[i - 1].position.x >= 400);
+    }
+    assert.deepEqual(project.edges, project.revisions.find((r) => r.version === 19).edges, 'A organização linear deve preservar as relações.');
     const full = project.revisions.find((revision) => revision.version === 9);
     assert.equal(full.nodes.length, 19, 'O mapa completo deve permanecer no histórico.');
     assert.equal(full.edges.length, 25);

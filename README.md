@@ -13,7 +13,7 @@ Repositório: https://github.com/DevKaue/arquitetura-santa-cecilia
 Referência:  main
 ```
 
-Executar a análise, revisar evidências e abrir o rascunho gerado. O Compose descreve nove serviços, redes e volume. A inferência verificada identificou 23 blocos e 22 relações; esse mapa inclui imagens e abstrações de software. O desenho revisado em [buildarch/](buildarch/) acompanha as camadas e a evolução do PPT/PDF: v19 com 23 blocos/40 relações, 19 revisões e duas réplicas separadas. v12–v19 correspondem aos slides 5 e 13–19; versões anteriores permanecem preservadas.
+Executar a análise, revisar evidências e abrir o rascunho gerado. O Compose descreve nove serviços, redes e volume. A inferência verificada identificou 23 blocos e 22 relações; esse mapa inclui imagens e abstrações de software. O desenho revisado em [buildarch/](buildarch/) está em **v21: 23 blocos numerados numa faixa horizontal, 40 relações e 21 revisões**. A v19 preserva a referência por camadas; a v20 guarda a organização que estava no Desktop. v12–v19 correspondem aos slides 5 e 13–19. A numeração indica ordem de explicação, mantendo as relações técnicas e as duas réplicas separadas.
 
 ## Navegação
 
@@ -23,7 +23,8 @@ Executar a análise, revisar evidências e abrir o rascunho gerado. O Compose de
 | [Roteiro conforme a palestra](docs/apresentacao/02-roteiro-demonstracao.md) | Conduzir a demonstração e importar do GitHub |
 | [Cartão do apresentador](docs/apresentacao/03-cartao-apresentador.md) | Consultar parâmetros e sequência durante o ensaio |
 | [Perguntas e respostas](docs/apresentacao/04-perguntas-respostas.md) | Apoiar a discussão com a plateia |
-| [Guia da palestra em PDF](docs/apresentacao/guia-da-palestra.pdf) | Enviar para revisão e consultar o material diagramado |
+| [Guia de ganchos da versão linear](docs/apresentacao/06-guia-linear-e-ganchos.md) | Retomar a fala do chefe em cada bloco numerado |
+| [Guia da referência v19 em PDF](docs/apresentacao/guia-da-palestra.pdf) | Consultar o conteúdo completo e a correspondência dos slides |
 | [Visão e decisões](docs/arquitetura/01-visao-e-decisoes.md) | Jornadas, trade-offs e operação |
 | [Modelo de dados](docs/arquitetura/02-modelo-de-dados.md) | Pedidos, reservas, outbox e deduplicação |
 | [Checkout e eventos](docs/arquitetura/03-checkout-e-eventos.md) | Sequência transacional e integração externa |
