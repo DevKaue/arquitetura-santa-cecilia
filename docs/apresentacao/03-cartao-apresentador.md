@@ -27,6 +27,8 @@ Para a disposição atual e os ganchos das oito peças, usar o [guia de leitura 
 
 ### Controles dos Labs
 
+**Carga ao vivo: selecionar os Labs.** O principal v22 contém ciclos entre planos de controle/operação e é recusado pelo Laboratório de carga. [Diagnóstico e procedimento](08-diagnostico-da-simulacao.md).
+
 Temporal: **2.000 req/min · Pico · 4x · 10 min virtuais · Nenhuma falha**. Labs 01/02: **895 ms / 68%**; Lab 03: **48 ms / 0,05%**. São saídas do modelo.
 
 Carga ao vivo: **2.000 usuários · 10 ações/min · 30 s virtuais**. 10.000 geradas; Labs 01/02 deixam ~2.650 pendentes; Lab 03 drena tudo. Os slides não fixam esses controles.

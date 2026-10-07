@@ -86,6 +86,8 @@ Canary recebe uma fração do tráfego ou uma região; se as métricas piorarem,
 
 **Ação:** mostrar as peças do principal e usar os Labs para a comparação controlada. Os motores do Build Arch estimam resultados; o mapa completo inclui planos de controle/replicação que não devem ser interpretados como todos os saltos HTTP.
 
+O Laboratório de carga recusa ciclos no principal v22, pois trata todas as relações como percurso da carga. Para essa etapa, selecionar os Labs. O [diagnóstico e procedimento verificado](08-diagnostico-da-simulacao.md) explicam a restrição e os controles.
+
 Temporal: **2.000 req/min**, **Pico**, **4x**, **10 min virtuais**, **Nenhuma falha**.
 
 | Saída do modelo | Lab 01 | Lab 02 | Lab 03 |

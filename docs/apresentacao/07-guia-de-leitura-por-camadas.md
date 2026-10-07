@@ -51,6 +51,8 @@ No **slide 20**, ligar métricas ao CI/CD: versão nova entra numa fração do t
 
 Nos **slides 22–23**, usar os Labs para mostrar por que escalar a aplicação não remove um gargalo no banco. A leitura de P95 pertence ao monitoramento real; as saídas heurísticas do Build Arch são estimativas do modelo.
 
+O mapa completo v22 é recusado pelo Laboratório de carga por ciclos entre controle, telemetria e dados. Usar os Labs nessa etapa. O [diagnóstico](08-diagnostico-da-simulacao.md) registra a causa e a execução do motor com os projetos salvos no Desktop.
+
 Nos **slides 24–25**, localizar compute nas aplicações/containers, storage no banco, egress entre regiões e CDN na borda. Comparar as categorias e esforço de operação própria/gerenciada sem acrescentar preços fixos. Encerrar com a arquitetura evoluindo conforme o problema, segurança por peça e caminho de volta.
 
 ## O que vem das fontes e o que é aprofundamento

@@ -1,0 +1,271 @@
+{
+  "execution": "Motor executado diretamente com os projetos salvos no Desktop; mensagem também observada na interface. Não é registro de execução de cliques na UI.",
+  "desktop": {
+    "version": 22,
+    "revisionDirty": true,
+    "nodes": 23,
+    "edges": 40
+  },
+  "config": {
+    "users": 10000,
+    "actionsPerMinute": 20,
+    "duration": 30,
+    "entryId": "users",
+    "failedNodeId": ""
+  },
+  "currentResult": {
+    "accepted": false,
+    "error": "Há um ciclo no caminho da carga. Crie um fluxo sem retorno para esta simulação."
+  },
+  "lightResult": {
+    "accepted": false,
+    "error": "Há um ciclo no caminho da carga. Crie um fluxo sem retorno para esta simulação."
+  },
+  "publicResult": {
+    "accepted": false,
+    "error": "Há um ciclo no caminho da carga. Crie um fluxo sem retorno para esta simulação."
+  },
+  "cycles": [
+    {
+      "nodes": [
+        "catalog",
+        "metrics",
+        "autoscaler",
+        "orchestrator",
+        "catalog"
+      ],
+      "labels": [
+        "API de catálogo",
+        "Métricas / painel",
+        "Autoscaler",
+        "Containers",
+        "API de catálogo"
+      ],
+      "edges": [
+        {
+          "id": "catalog-metrics",
+          "protocol": "Telemetria: metrics",
+          "evidence": "PPT e PDF, slides 18, 19. Plano de operação; relação lógica manual. Latência cadastrada é parâmetro ilustrativo, sem benchmark."
+        },
+        {
+          "id": "metrics-autoscaler",
+          "protocol": "CPU / alarme",
+          "evidence": "PPT e PDF, slides 19, 21. Plano de controle; relação lógica manual. Latência cadastrada é parâmetro ilustrativo, sem benchmark."
+        },
+        {
+          "id": "autoscaler-orchestrator",
+          "protocol": "Ajustar réplicas / teto",
+          "evidence": "PPT e PDF, slides 19, 21. Plano de controle; relação lógica manual. Latência cadastrada é parâmetro ilustrativo, sem benchmark."
+        },
+        {
+          "id": "orchestrator-catalog",
+          "protocol": "Executar containers",
+          "evidence": "PPT e PDF, slides 19. Plano de controle; relação lógica manual. Latência cadastrada é parâmetro ilustrativo, sem benchmark."
+        }
+      ]
+    },
+    {
+      "nodes": [
+        "checkout",
+        "primary",
+        "region",
+        "orchestrator",
+        "checkout"
+      ],
+      "labels": [
+        "API de checkout",
+        "Banco de escrita",
+        "Região secundária",
+        "Containers",
+        "API de checkout"
+      ],
+      "edges": [
+        {
+          "id": "checkout-primary",
+          "protocol": "Compra autoritativa",
+          "evidence": "PPT e PDF, slides 11, 17. Plano de dados; relação lógica manual. Latência cadastrada é parâmetro ilustrativo, sem benchmark."
+        },
+        {
+          "id": "primary-region",
+          "protocol": "Continuidade de dados",
+          "evidence": "PPT e PDF, slides 18. Plano de replicação; relação lógica manual. Latência cadastrada é parâmetro ilustrativo, sem benchmark."
+        },
+        {
+          "id": "region-orchestrator",
+          "protocol": "Aplicação regional",
+          "evidence": "PPT e PDF, slides 18, 19. Plano de controle; relação lógica manual. Latência cadastrada é parâmetro ilustrativo, sem benchmark."
+        },
+        {
+          "id": "orchestrator-checkout",
+          "protocol": "Executar containers",
+          "evidence": "PPT e PDF, slides 19. Plano de controle; relação lógica manual. Latência cadastrada é parâmetro ilustrativo, sem benchmark."
+        }
+      ]
+    },
+    {
+      "nodes": [
+        "checkout",
+        "queue",
+        "autoscaler",
+        "orchestrator",
+        "checkout"
+      ],
+      "labels": [
+        "API de checkout",
+        "Fila assíncrona",
+        "Autoscaler",
+        "Containers",
+        "API de checkout"
+      ],
+      "edges": [
+        {
+          "id": "checkout-queue",
+          "protocol": "Trabalho pós-compra",
+          "evidence": "PPT e PDF, slides 18, 19. Plano de dados; relação lógica manual. Latência cadastrada é parâmetro ilustrativo, sem benchmark."
+        },
+        {
+          "id": "queue-autoscaler",
+          "protocol": "Backlog / idade",
+          "evidence": "PPT e PDF, slides 18, 19. Plano de controle; relação lógica manual. Latência cadastrada é parâmetro ilustrativo, sem benchmark."
+        },
+        {
+          "id": "autoscaler-orchestrator",
+          "protocol": "Ajustar réplicas / teto",
+          "evidence": "PPT e PDF, slides 19, 21. Plano de controle; relação lógica manual. Latência cadastrada é parâmetro ilustrativo, sem benchmark."
+        },
+        {
+          "id": "orchestrator-checkout",
+          "protocol": "Executar containers",
+          "evidence": "PPT e PDF, slides 19. Plano de controle; relação lógica manual. Latência cadastrada é parâmetro ilustrativo, sem benchmark."
+        }
+      ]
+    },
+    {
+      "nodes": [
+        "queue",
+        "worker",
+        "primary",
+        "region",
+        "orchestrator",
+        "checkout",
+        "queue"
+      ],
+      "labels": [
+        "Fila assíncrona",
+        "Notificações",
+        "Banco de escrita",
+        "Região secundária",
+        "Containers",
+        "API de checkout",
+        "Fila assíncrona"
+      ],
+      "edges": [
+        {
+          "id": "queue-worker",
+          "protocol": "Consumir / ACK",
+          "evidence": "PPT e PDF, slides 18, 19. Plano de dados; relação lógica manual. Latência cadastrada é parâmetro ilustrativo, sem benchmark."
+        },
+        {
+          "id": "worker-primary",
+          "protocol": "Baixa após reserva",
+          "evidence": "PPT e PDF, slides 18. Plano de dados; relação lógica manual. Latência cadastrada é parâmetro ilustrativo, sem benchmark."
+        },
+        {
+          "id": "primary-region",
+          "protocol": "Continuidade de dados",
+          "evidence": "PPT e PDF, slides 18. Plano de replicação; relação lógica manual. Latência cadastrada é parâmetro ilustrativo, sem benchmark."
+        },
+        {
+          "id": "region-orchestrator",
+          "protocol": "Aplicação regional",
+          "evidence": "PPT e PDF, slides 18, 19. Plano de controle; relação lógica manual. Latência cadastrada é parâmetro ilustrativo, sem benchmark."
+        },
+        {
+          "id": "orchestrator-checkout",
+          "protocol": "Executar containers",
+          "evidence": "PPT e PDF, slides 19. Plano de controle; relação lógica manual. Latência cadastrada é parâmetro ilustrativo, sem benchmark."
+        },
+        {
+          "id": "checkout-queue",
+          "protocol": "Trabalho pós-compra",
+          "evidence": "PPT e PDF, slides 18, 19. Plano de dados; relação lógica manual. Latência cadastrada é parâmetro ilustrativo, sem benchmark."
+        }
+      ]
+    }
+  ],
+  "dataOnlyCheck": {
+    "edges": 12,
+    "accepted": true,
+    "second": 91,
+    "generated": 99999.99999999997,
+    "completed": 99675.45588767946,
+    "failed": 324.544112320334,
+    "pending": 0,
+    "finished": true,
+    "note": "Experimento de diagnóstico, não uma simulação fiel de 95/5 ou HIT/MISS; as rotas dividem volume igualmente."
+  },
+  "labConfig": {
+    "users": 2000,
+    "actionsPerMinute": 10,
+    "duration": 30,
+    "entryId": "users",
+    "failedNodeId": ""
+  },
+  "labs": [
+    {
+      "lab": 1,
+      "name": "Santa Cecília | Lab 01 | Inicial: banco limita",
+      "accepted": true,
+      "second": 150,
+      "generated": 10000,
+      "completed": 7350,
+      "failed": 0,
+      "pending": 2649.999999999998,
+      "finished": true
+    },
+    {
+      "lab": 2,
+      "name": "Santa Cecília | Lab 02 | Escalar a API não resolve",
+      "accepted": true,
+      "second": 150,
+      "generated": 10000,
+      "completed": 7350,
+      "failed": 0,
+      "pending": 2649.999999999998,
+      "finished": true
+    },
+    {
+      "lab": 3,
+      "name": "Santa Cecília | Lab 03 | Capacidade no gargalo",
+      "accepted": true,
+      "second": 33,
+      "generated": 10000,
+      "completed": 10000,
+      "failed": 0,
+      "pending": 0,
+      "finished": true
+    }
+  ],
+  "forcedFailure": {
+    "accepted": true,
+    "second": 33,
+    "generated": 10000,
+    "completed": 0,
+    "failed": 10000,
+    "pending": 0,
+    "finished": true
+  },
+  "web": {
+    "assessment": "Viável pelo código PWA; usa o mesmo módulo de carga e guarda projetos em IndexedDB, sem sincronização automática com o Desktop.",
+    "liveLoadUiTested": false,
+    "reason": "Investigação mantida no Desktop conforme preferência do usuário."
+  },
+  "findings": [
+    "O motor percorre todas as conexões alcançáveis a partir da entrada, sem separar os planos.",
+    "Os ciclos mostrados cruzam dados, controle, replicação e operação.",
+    "A rejeição ocorre antes de gerar carga e também com 1 usuário.",
+    "O motor divide rotas igualmente e não emula as latências cadastradas; não representa 95/5, HIT/MISS ou P95 medido.",
+    "O mesmo módulo de carga é usado pelas interfaces Desktop e PWA; a migração de interface não muda essa regra."
+  ],
+  "inspectedOn": "2026-10-07"
+}

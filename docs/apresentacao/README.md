@@ -7,6 +7,7 @@
 | [03 · Cartão do apresentador](03-cartao-apresentador.md) | Consulta rápida no ensaio e durante a apresentação |
 | [04 · Perguntas e respostas](04-perguntas-respostas.md) | Discussão com a plateia; resposta breve e aprofundamento |
 | [07 · Leitura por camadas](07-guia-de-leitura-por-camadas.md) | Guia atual: oito peças dos slides, camadas e duas jornadas |
+| [08 · Diagnóstico da simulação](08-diagnostico-da-simulacao.md) | Causa do ciclo no principal, Labs verificados e uso possível da web |
 | [06 · Guia linear histórico](06-guia-linear-e-ganchos.md) | Consulta da organização anterior v21 |
 
 A importação usa https://github.com/DevKaue/arquitetura-santa-cecilia, referência **main**. A arquitetura revisada e os Labs estão em [buildarch/](../../buildarch/). Evidências e limites ficam em [validação](../validacao/README.md).

@@ -34,6 +34,8 @@ Executar a análise, revisar evidências e abrir o rascunho gerado. O Compose de
 
 ## O que o exemplo ensina
 
+O desenho principal é a referência para explicar todas as camadas. Para a carga ao vivo, usar os três Labs: o principal contém ciclos de controle/telemetria/replicação que o Laboratório de carga trata como percurso de requisições e recusa. O [diagnóstico verificado](docs/apresentacao/08-diagnostico-da-simulacao.md) explica a causa, os controles e a alternativa web.
+
 - Leitura eventual em CDN/cache/réplicas e compra autoritativa no writer.
 - Reserva concorrente, autorização por pedido e idempotência.
 - Fila/worker, observabilidade e multi-região conforme os slides; outbox/DLQ no aprofundamento preservado.
