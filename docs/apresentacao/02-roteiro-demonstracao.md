@@ -3,6 +3,8 @@
 
 O roteiro segue a ordem e o conteúdo do PPT/PDF. **A duração fica a critério de vocês.** Abrir o principal em **Trabalho atual · v22**, conferir **Salvo agora** e enquadrar o canvas. As conexões de DNS, orquestração, telemetria e entrega têm função de controle/operação; não são todas etapas de uma compra.
 
+Para apresentar o conjunto em três mapas complementares, usar **01 Camadas → 02 Escala → Arquitetura Santa Cecília**, com as falas do [guia das três visões](09-tres-visoes-da-arquitetura.md). O roteiro abaixo continua disponível para percorrer a evolução por revisões do principal.
+
 
 Para a disposição atual e os ganchos das oito peças, usar o [guia de leitura por camadas](07-guia-de-leitura-por-camadas.md).
 

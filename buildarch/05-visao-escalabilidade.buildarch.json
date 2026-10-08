@@ -1,0 +1,2126 @@
+{
+  "id": "santa-cecilia-visao-escala",
+  "name": "Arquitetura Santa Cecília | 02 Escala",
+  "description": "VISÃO 02 | Evolução e escala. Zoom da segunda imagem (slide 17), retomando slides 13–16. Usuários, DNS/CDN e balanceador à esquerda; App 1/2/3 no centro; cache e writer/réplicas à direita. As três Apps são instâncias stateless equivalentes. Catálogo/busca usam cache; no MISS, leem de uma réplica. Checkout escreve diretamente no writer, sem depender de cache para decidir a compra. Replicação é assíncrona e pode atrasar. 95% leitura / 5% escrita é o perfil dos slides, não a distribuição calculada pelo simulador atual. Criptografia em repouso e menor privilégio. Complementa a visão 01; todas as peças se reúnem no projeto principal. Guia: docs/apresentacao/09-tres-visoes-da-arquitetura.md.",
+  "category": "software",
+  "status": "review",
+  "version": 1,
+  "nodes": [
+    {
+      "data": {
+        "availability": 99.95,
+        "capacity": 200000,
+        "cpu": 30,
+        "currentLoad": 12000,
+        "deployment": {},
+        "description": "BORDA | Slides 3–4, 13, 19. Clientes em vários continentes e fusos; milhões de visitas/dia. Black Friday: pico 10x. Perfil do caso: 95% leitura (catálogo, busca, produtos) e 5% escrita. Checkout e pagamento têm maior impacto de negócio. Os slides não fixam req/min; 2.000/20.000 pertencem aos Labs. Perguntas: quantos usuários, de onde, qual pico e o que pode atrasar?",
+        "instances": 1,
+        "kind": "client",
+        "label": "Usuários globais",
+        "latency": 10,
+        "memory": 30,
+        "monthlyCost": 0,
+        "replicas": 1,
+        "storage": 2,
+        "technology": "Web / mobile"
+      },
+      "id": "users",
+      "position": {
+        "x": 0,
+        "y": 340
+      },
+      "type": "architecture"
+    },
+    {
+      "data": {
+        "availability": 99.95,
+        "capacity": 200000,
+        "cpu": 30,
+        "currentLoad": 12000,
+        "deployment": {},
+        "description": "BORDA | Slides 13, 18–19. Resolve o domínio e orienta o destino regional; não transporta cada requisição HTTPS. Consulta DNS e tráfego da aplicação são relações distintas. Health checks e política de roteamento participam da troca de região. Proximidade geográfica e continuidade são os motivos da peça. Exemplos de provedores vêm dos slides; a escolha concreta permanece aberta.",
+        "instances": 2,
+        "kind": "network",
+        "label": "DNS",
+        "latency": 10,
+        "memory": 30,
+        "monthlyCost": 0,
+        "replicas": 2,
+        "storage": 0,
+        "technology": "Route 53 / Cloud DNS"
+      },
+      "id": "dns",
+      "position": {
+        "x": 400,
+        "y": 0
+      },
+      "type": "architecture"
+    },
+    {
+      "data": {
+        "availability": 99.95,
+        "capacity": 200000,
+        "cpu": 30,
+        "currentLoad": 12000,
+        "deployment": {},
+        "description": "BORDA | Slides 13–14, 18–19. Imagens, CSS e JS perto do usuário, reduzindo latência e trabalho do backend. Slide 13: 90% do catálogo é conteúdo que não muda a cada visita; isso não equivale a uma taxa de cache HIT medida. Conteúdo dinâmico segue à entrada. Não cachear dados de pagamento/documentos. CloudFront e Cloudflare aparecem também como exemplos de alcance global no slide 18.",
+        "instances": 2,
+        "kind": "gateway",
+        "label": "CDN",
+        "latency": 10,
+        "memory": 30,
+        "monthlyCost": 0,
+        "replicas": 2,
+        "storage": 8,
+        "technology": "Cloudflare / Fastly"
+      },
+      "id": "cdn",
+      "position": {
+        "x": 400,
+        "y": 680
+      },
+      "type": "architecture"
+    },
+    {
+      "data": {
+        "availability": 99.95,
+        "capacity": 120000,
+        "cpu": 30,
+        "currentLoad": 12000,
+        "deployment": {},
+        "description": "ENTRADA | Slides 10, 14, 19, 21. Distribui tráfego entre instâncias saudáveis e retira quem não responde. TLS termina na entrada; uma nova sessão TLS protege o trecho até o backend, atendendo HTTPS em todos os trechos citados no slide. Rate limiting por identidade/origem; limites de conexão e timeout. Quando o pico excede o planejado, controlar acesso e preservar checkout/catálogo.",
+        "instances": 2,
+        "kind": "gateway",
+        "label": "Load Balancer",
+        "latency": 10,
+        "memory": 30,
+        "monthlyCost": 250,
+        "replicas": 2,
+        "storage": 1,
+        "technology": "L7 / HTTPS / rate limiting"
+      },
+      "id": "lb",
+      "position": {
+        "x": 800,
+        "y": 340
+      },
+      "type": "architecture"
+    },
+    {
+      "data": {
+        "availability": 99.95,
+        "capacity": 30000,
+        "cpu": 30,
+        "currentLoad": 6000,
+        "deployment": {},
+        "description": "APLICAÇÃO | Slides 15–17. Esta é uma das três cópias da mesma aplicação stateless; não é um serviço de domínio diferente. Qualquer cópia atende qualquer requisição, sem sessão em memória local. O balanceador distribui entre cópias saudáveis. Toda rota valida autenticação e autorização. Catálogo/busca consultam cache e, no MISS, uma réplica saudável; checkout grava diretamente no banco de escrita. Perfil do caso: 95% leitura e 5% escrita, sem impor taxa de HIT não medida. Adicionar cópias aumenta capacidade da aplicação; não remove automaticamente um gargalo de banco. Valores do bloco são ilustrativos.",
+        "instances": 1,
+        "kind": "service",
+        "label": "App 1",
+        "latency": 10,
+        "memory": 30,
+        "monthlyCost": 0,
+        "replicas": 1,
+        "storage": 8,
+        "technology": "Stateless"
+      },
+      "id": "app1",
+      "position": {
+        "x": 1200,
+        "y": 0
+      },
+      "type": "architecture"
+    },
+    {
+      "data": {
+        "availability": 99.95,
+        "capacity": 30000,
+        "cpu": 30,
+        "currentLoad": 6000,
+        "deployment": {},
+        "description": "APLICAÇÃO | Slides 15–17. Esta é uma das três cópias da mesma aplicação stateless; não é um serviço de domínio diferente. Qualquer cópia atende qualquer requisição, sem sessão em memória local. O balanceador distribui entre cópias saudáveis. Toda rota valida autenticação e autorização. Catálogo/busca consultam cache e, no MISS, uma réplica saudável; checkout grava diretamente no banco de escrita. Perfil do caso: 95% leitura e 5% escrita, sem impor taxa de HIT não medida. Adicionar cópias aumenta capacidade da aplicação; não remove automaticamente um gargalo de banco. Valores do bloco são ilustrativos.",
+        "instances": 1,
+        "kind": "service",
+        "label": "App 2",
+        "latency": 10,
+        "memory": 30,
+        "monthlyCost": 0,
+        "replicas": 1,
+        "storage": 8,
+        "technology": "Stateless"
+      },
+      "id": "app2",
+      "position": {
+        "x": 1200,
+        "y": 340
+      },
+      "type": "architecture"
+    },
+    {
+      "data": {
+        "availability": 99.95,
+        "capacity": 30000,
+        "cpu": 30,
+        "currentLoad": 6000,
+        "deployment": {},
+        "description": "APLICAÇÃO | Slides 15–17. Esta é uma das três cópias da mesma aplicação stateless; não é um serviço de domínio diferente. Qualquer cópia atende qualquer requisição, sem sessão em memória local. O balanceador distribui entre cópias saudáveis. Toda rota valida autenticação e autorização. Catálogo/busca consultam cache e, no MISS, uma réplica saudável; checkout grava diretamente no banco de escrita. Perfil do caso: 95% leitura e 5% escrita, sem impor taxa de HIT não medida. Adicionar cópias aumenta capacidade da aplicação; não remove automaticamente um gargalo de banco. Valores do bloco são ilustrativos.",
+        "instances": 1,
+        "kind": "service",
+        "label": "App 3",
+        "latency": 10,
+        "memory": 30,
+        "monthlyCost": 0,
+        "replicas": 1,
+        "storage": 8,
+        "technology": "Stateless"
+      },
+      "id": "app3",
+      "position": {
+        "x": 1200,
+        "y": 680
+      },
+      "type": "architecture"
+    },
+    {
+      "data": {
+        "availability": 99.95,
+        "capacity": 80000,
+        "cpu": 30,
+        "currentLoad": 12000,
+        "deployment": {},
+        "description": "DADOS | Slides 9, 16–17, 19. Memória rápida para consultas repetidas de catálogo, produto e busca; HIT evita SQL, MISS usa uma réplica. Nunca cachear pagamento ou documento; informação pessoal requer TTL curto, conforme o slide 16. TTL/invalidação são políticas a definir; nenhum valor em segundos é fixado pelos slides. Cache é reconstruível, não fonte de verdade para compra. Falha pede fallback com limite de carga.",
+        "instances": 2,
+        "kind": "cache",
+        "label": "Cache de catálogo",
+        "latency": 10,
+        "memory": 30,
+        "monthlyCost": 160,
+        "replicas": 2,
+        "storage": 12,
+        "technology": "Redis / Memcached"
+      },
+      "id": "redis",
+      "position": {
+        "x": 1660,
+        "y": 340
+      },
+      "type": "architecture"
+    },
+    {
+      "data": {
+        "availability": 99.95,
+        "capacity": 20000,
+        "cpu": 30,
+        "currentLoad": 4000,
+        "deployment": {},
+        "description": "DADOS | Slides 11, 17, 19. Fonte da verdade para checkout, pagamento confirmado e estoque final. Uma escrita autoritativa; réplicas de leitura recebem propagação e podem atrasar. Criptografia em repouso e credenciais de menor privilégio. PostgreSQL, MySQL e SQL Server são alternativas do slide; o schema de oito tabelas é aprofundamento do nosso exemplo, não requisito imposto pela palestra. Standby/backup complementam HA; validar recuperação.",
+        "instances": 2,
+        "kind": "database",
+        "label": "Banco de escrita",
+        "latency": 10,
+        "memory": 30,
+        "monthlyCost": 400,
+        "replicas": 2,
+        "schema": {
+          "engine": "PostgreSQL",
+          "paradigm": "relational",
+          "tables": [
+            {
+              "columns": [
+                {
+                  "id": "products-id",
+                  "name": "id",
+                  "nullable": false,
+                  "primaryKey": true,
+                  "type": "uuid",
+                  "unique": true
+                },
+                {
+                  "id": "products-sku",
+                  "name": "sku",
+                  "nullable": false,
+                  "primaryKey": false,
+                  "type": "varchar",
+                  "unique": true
+                },
+                {
+                  "id": "products-name",
+                  "name": "name",
+                  "nullable": false,
+                  "primaryKey": false,
+                  "type": "varchar",
+                  "unique": false
+                },
+                {
+                  "id": "products-price",
+                  "name": "price",
+                  "nullable": false,
+                  "primaryKey": false,
+                  "type": "decimal",
+                  "unique": false
+                }
+              ],
+              "description": "Catálogo público",
+              "id": "products",
+              "indexes": [],
+              "name": "products"
+            },
+            {
+              "columns": [
+                {
+                  "id": "inventory-product_id",
+                  "name": "product_id",
+                  "nullable": false,
+                  "primaryKey": true,
+                  "references": {
+                    "columnId": "products-id",
+                    "tableId": "products"
+                  },
+                  "type": "uuid",
+                  "unique": true
+                },
+                {
+                  "id": "inventory-available",
+                  "name": "available",
+                  "nullable": false,
+                  "primaryKey": false,
+                  "type": "integer",
+                  "unique": false
+                },
+                {
+                  "id": "inventory-version",
+                  "name": "version",
+                  "nullable": false,
+                  "primaryKey": false,
+                  "type": "integer",
+                  "unique": false
+                }
+              ],
+              "description": "Reserva autoritativa no checkout",
+              "id": "inventory",
+              "indexes": [],
+              "name": "inventory"
+            },
+            {
+              "columns": [
+                {
+                  "id": "orders-id",
+                  "name": "id",
+                  "nullable": false,
+                  "primaryKey": true,
+                  "type": "uuid",
+                  "unique": true
+                },
+                {
+                  "id": "orders-idempotency_key",
+                  "name": "idempotency_key",
+                  "nullable": false,
+                  "primaryKey": false,
+                  "type": "varchar",
+                  "unique": true
+                },
+                {
+                  "id": "orders-status",
+                  "name": "status",
+                  "nullable": false,
+                  "primaryKey": false,
+                  "type": "varchar",
+                  "unique": false
+                },
+                {
+                  "id": "orders-total",
+                  "name": "total",
+                  "nullable": false,
+                  "primaryKey": false,
+                  "type": "decimal",
+                  "unique": false
+                },
+                {
+                  "id": "orders-created_at",
+                  "name": "created_at",
+                  "nullable": false,
+                  "primaryKey": false,
+                  "type": "timestamp",
+                  "unique": false
+                },
+                {
+                  "id": "orders-owner_subject",
+                  "name": "owner_subject",
+                  "nullable": false,
+                  "primaryKey": false,
+                  "type": "varchar",
+                  "unique": false
+                },
+                {
+                  "id": "orders-request_hash",
+                  "name": "request_hash",
+                  "nullable": false,
+                  "primaryKey": false,
+                  "type": "varchar",
+                  "unique": false
+                },
+                {
+                  "id": "orders-currency",
+                  "name": "currency",
+                  "nullable": false,
+                  "primaryKey": false,
+                  "type": "varchar",
+                  "unique": false
+                },
+                {
+                  "id": "orders-updated_at",
+                  "name": "updated_at",
+                  "nullable": false,
+                  "primaryKey": false,
+                  "type": "timestamp",
+                  "unique": false
+                }
+              ],
+              "description": "Um pedido por chave de idempotência",
+              "id": "orders",
+              "indexes": [
+                [
+                  "orders-owner_subject",
+                  "orders-created_at"
+                ]
+              ],
+              "name": "orders"
+            },
+            {
+              "columns": [
+                {
+                  "id": "order_items-id",
+                  "name": "id",
+                  "nullable": false,
+                  "primaryKey": true,
+                  "type": "uuid",
+                  "unique": true
+                },
+                {
+                  "id": "order_items-order_id",
+                  "name": "order_id",
+                  "nullable": false,
+                  "primaryKey": false,
+                  "references": {
+                    "columnId": "orders-id",
+                    "tableId": "orders"
+                  },
+                  "type": "uuid",
+                  "unique": false
+                },
+                {
+                  "id": "order_items-product_id",
+                  "name": "product_id",
+                  "nullable": false,
+                  "primaryKey": false,
+                  "references": {
+                    "columnId": "products-id",
+                    "tableId": "products"
+                  },
+                  "type": "uuid",
+                  "unique": false
+                },
+                {
+                  "id": "order_items-quantity",
+                  "name": "quantity",
+                  "nullable": false,
+                  "primaryKey": false,
+                  "type": "integer",
+                  "unique": false
+                },
+                {
+                  "id": "order_items-unit_price",
+                  "name": "unit_price",
+                  "nullable": false,
+                  "primaryKey": false,
+                  "type": "decimal",
+                  "unique": false
+                }
+              ],
+              "description": "Itens do pedido",
+              "id": "order_items",
+              "indexes": [
+                [
+                  "order_items-order_id"
+                ],
+                [
+                  "order_items-product_id"
+                ]
+              ],
+              "name": "order_items"
+            },
+            {
+              "columns": [
+                {
+                  "id": "payment_events-id",
+                  "name": "id",
+                  "nullable": false,
+                  "primaryKey": true,
+                  "type": "uuid",
+                  "unique": true
+                },
+                {
+                  "id": "payment_events-provider_event_id",
+                  "name": "provider_event_id",
+                  "nullable": false,
+                  "primaryKey": false,
+                  "type": "varchar",
+                  "unique": true
+                },
+                {
+                  "id": "payment_events-order_id",
+                  "name": "order_id",
+                  "nullable": false,
+                  "primaryKey": false,
+                  "references": {
+                    "columnId": "orders-id",
+                    "tableId": "orders"
+                  },
+                  "type": "uuid",
+                  "unique": false
+                },
+                {
+                  "id": "payment_events-status",
+                  "name": "status",
+                  "nullable": false,
+                  "primaryKey": false,
+                  "type": "varchar",
+                  "unique": false
+                },
+                {
+                  "id": "payment_events-received_at",
+                  "name": "received_at",
+                  "nullable": false,
+                  "primaryKey": false,
+                  "type": "timestamp",
+                  "unique": false
+                }
+              ],
+              "description": "Deduplicar webhooks e correlacionar pedido",
+              "id": "payment_events",
+              "indexes": [
+                [
+                  "payment_events-order_id"
+                ]
+              ],
+              "name": "payment_events"
+            },
+            {
+              "columns": [
+                {
+                  "id": "outbox-id",
+                  "name": "id",
+                  "nullable": false,
+                  "primaryKey": true,
+                  "type": "uuid",
+                  "unique": true
+                },
+                {
+                  "id": "outbox-order_id",
+                  "name": "order_id",
+                  "nullable": false,
+                  "primaryKey": false,
+                  "references": {
+                    "columnId": "orders-id",
+                    "tableId": "orders"
+                  },
+                  "type": "uuid",
+                  "unique": false
+                },
+                {
+                  "id": "outbox-event_type",
+                  "name": "event_type",
+                  "nullable": false,
+                  "primaryKey": false,
+                  "type": "varchar",
+                  "unique": false
+                },
+                {
+                  "id": "outbox-created_at",
+                  "name": "created_at",
+                  "nullable": false,
+                  "primaryKey": false,
+                  "type": "timestamp",
+                  "unique": false
+                },
+                {
+                  "id": "outbox-published",
+                  "name": "published",
+                  "nullable": false,
+                  "primaryKey": false,
+                  "type": "boolean",
+                  "unique": false
+                },
+                {
+                  "id": "outbox-payload",
+                  "name": "payload",
+                  "nullable": false,
+                  "primaryKey": false,
+                  "type": "json",
+                  "unique": false
+                },
+                {
+                  "id": "outbox-attempts",
+                  "name": "attempts",
+                  "nullable": false,
+                  "primaryKey": false,
+                  "type": "integer",
+                  "unique": false
+                },
+                {
+                  "id": "outbox-published_at",
+                  "name": "published_at",
+                  "nullable": true,
+                  "primaryKey": false,
+                  "type": "timestamp",
+                  "unique": false
+                }
+              ],
+              "description": "Evento na mesma transação do pedido",
+              "id": "outbox",
+              "indexes": [
+                [
+                  "outbox-order_id"
+                ],
+                [
+                  "outbox-published",
+                  "outbox-created_at"
+                ]
+              ],
+              "name": "outbox"
+            },
+            {
+              "columns": [
+                {
+                  "id": "reservations-id",
+                  "name": "id",
+                  "nullable": false,
+                  "primaryKey": true,
+                  "type": "uuid",
+                  "unique": true
+                },
+                {
+                  "id": "reservations-order_id",
+                  "name": "order_id",
+                  "nullable": false,
+                  "primaryKey": false,
+                  "references": {
+                    "columnId": "orders-id",
+                    "tableId": "orders"
+                  },
+                  "type": "uuid",
+                  "unique": false
+                },
+                {
+                  "id": "reservations-product_id",
+                  "name": "product_id",
+                  "nullable": false,
+                  "primaryKey": false,
+                  "references": {
+                    "columnId": "products-id",
+                    "tableId": "products"
+                  },
+                  "type": "uuid",
+                  "unique": false
+                },
+                {
+                  "id": "reservations-quantity",
+                  "name": "quantity",
+                  "nullable": false,
+                  "primaryKey": false,
+                  "type": "integer",
+                  "unique": false
+                },
+                {
+                  "id": "reservations-status",
+                  "name": "status",
+                  "nullable": false,
+                  "primaryKey": false,
+                  "type": "varchar",
+                  "unique": false
+                },
+                {
+                  "id": "reservations-expires_at",
+                  "name": "expires_at",
+                  "nullable": false,
+                  "primaryKey": false,
+                  "type": "timestamp",
+                  "unique": false
+                }
+              ],
+              "description": "Reserva por pedido/produto, com expiração e compensação idempotente; estado deve ser reconciliado com pagamento.",
+              "id": "reservations",
+              "indexes": [
+                [
+                  "reservations-order_id"
+                ],
+                [
+                  "reservations-product_id"
+                ],
+                [
+                  "reservations-status",
+                  "reservations-expires_at"
+                ]
+              ],
+              "name": "reservations"
+            },
+            {
+              "columns": [
+                {
+                  "id": "processed_events-event_id",
+                  "name": "event_id",
+                  "nullable": false,
+                  "primaryKey": true,
+                  "references": {
+                    "columnId": "outbox-id",
+                    "tableId": "outbox"
+                  },
+                  "type": "uuid",
+                  "unique": false
+                },
+                {
+                  "id": "processed_events-consumer_name",
+                  "name": "consumer_name",
+                  "nullable": false,
+                  "primaryKey": true,
+                  "type": "varchar",
+                  "unique": false
+                },
+                {
+                  "id": "processed_events-processed_at",
+                  "name": "processed_at",
+                  "nullable": false,
+                  "primaryKey": false,
+                  "type": "timestamp",
+                  "unique": false
+                }
+              ],
+              "description": "Chave composta deduplica o mesmo evento por consumidor. Efeito externo exige suporte de idempotência próprio.",
+              "id": "processed_events",
+              "indexes": [],
+              "name": "processed_events"
+            }
+          ]
+        },
+        "storage": 42,
+        "technology": "PostgreSQL / SQL relacional"
+      },
+      "id": "primary",
+      "position": {
+        "x": 2180,
+        "y": -100
+      },
+      "type": "architecture"
+    },
+    {
+      "data": {
+        "availability": 99.95,
+        "capacity": 30000,
+        "cpu": 30,
+        "currentLoad": 6000,
+        "deployment": {},
+        "description": "DADOS | Slides 11, 17–18. Réplica próxima da aplicação na região principal. Catálogo/busca em MISS podem usar um destino saudável; réplicas A/B são alternativas, não duas leituras obrigatórias da mesma consulta. Monitorar atraso; nenhum checkout decide estoque por dado atrasado. Separação de leitura e escrita acompanha o perfil 95/5 do caso.",
+        "instances": 1,
+        "kind": "database",
+        "label": "Réplica de leitura A",
+        "latency": 10,
+        "memory": 30,
+        "monthlyCost": 180,
+        "replicas": 1,
+        "storage": 42,
+        "technology": "SQL / leitura eventual"
+      },
+      "id": "read1",
+      "position": {
+        "x": 2180,
+        "y": 340
+      },
+      "type": "architecture"
+    },
+    {
+      "data": {
+        "availability": 99.95,
+        "capacity": 30000,
+        "cpu": 30,
+        "currentLoad": 6000,
+        "deployment": {},
+        "description": "DADOS | Slides 11, 17–18. Segunda réplica de leitura, usada para ilustrar proximidade regional. Exemplo da palestra: leitura do cliente europeu em 40 ms, comparada a 220 ms cruzando o Atlântico. São valores do exemplo dos slides, não latências medidas nesta preparação. A réplica pode atrasar; não vira outro writer automaticamente. Escolha do destino respeita região e política de dados.",
+        "instances": 1,
+        "kind": "database",
+        "label": "Réplica de leitura B",
+        "latency": 10,
+        "memory": 30,
+        "monthlyCost": 180,
+        "replicas": 1,
+        "storage": 42,
+        "technology": "SQL / região próxima"
+      },
+      "id": "read2",
+      "position": {
+        "x": 2180,
+        "y": 780
+      },
+      "type": "architecture"
+    }
+  ],
+  "edges": [
+    {
+      "animated": false,
+      "data": {
+        "asynchronous": false,
+        "evidence": "PPT e PDF, slides 13. Plano de controle; relação lógica manual. Latência cadastrada é parâmetro ilustrativo, sem benchmark.",
+        "inferred": false,
+        "latency": 0,
+        "protocol": "Resolver domínio"
+      },
+      "id": "users-dns",
+      "source": "users",
+      "target": "dns",
+      "type": "smoothstep"
+    },
+    {
+      "animated": false,
+      "data": {
+        "asynchronous": false,
+        "evidence": "PPT e PDF, slides 13. Plano de dados; relação lógica manual. Latência cadastrada é parâmetro ilustrativo, sem benchmark.",
+        "inferred": false,
+        "latency": 10,
+        "protocol": "Estático próximo"
+      },
+      "id": "users-cdn",
+      "source": "users",
+      "target": "cdn",
+      "type": "smoothstep"
+    },
+    {
+      "animated": false,
+      "data": {
+        "asynchronous": false,
+        "evidence": "PPT e PDF, slides 14. Plano de dados; relação lógica manual. Latência cadastrada é parâmetro ilustrativo, sem benchmark.",
+        "inferred": false,
+        "latency": 10,
+        "protocol": "Dinâmico / HTTPS"
+      },
+      "id": "cdn-lb",
+      "source": "cdn",
+      "target": "lb",
+      "type": "smoothstep"
+    },
+    {
+      "animated": false,
+      "data": {
+        "asynchronous": false,
+        "evidence": "PPT e PDF, slides 15. Plano de dados; relação lógica manual. Latência cadastrada é parâmetro ilustrativo, sem benchmark.",
+        "inferred": false,
+        "latency": 10,
+        "protocol": "Distribuir / health check"
+      },
+      "id": "lb-app1",
+      "source": "lb",
+      "target": "app1",
+      "type": "smoothstep"
+    },
+    {
+      "animated": false,
+      "data": {
+        "asynchronous": false,
+        "evidence": "PPT e PDF, slides 15. Plano de dados; relação lógica manual. Latência cadastrada é parâmetro ilustrativo, sem benchmark.",
+        "inferred": false,
+        "latency": 10,
+        "protocol": "Distribuir / health check"
+      },
+      "id": "lb-app2",
+      "source": "lb",
+      "target": "app2",
+      "type": "smoothstep"
+    },
+    {
+      "animated": false,
+      "data": {
+        "asynchronous": false,
+        "evidence": "PPT e PDF, slides 15. Plano de dados; relação lógica manual. Latência cadastrada é parâmetro ilustrativo, sem benchmark.",
+        "inferred": false,
+        "latency": 10,
+        "protocol": "Distribuir / health check"
+      },
+      "id": "lb-app3",
+      "source": "lb",
+      "target": "app3",
+      "type": "smoothstep"
+    },
+    {
+      "animated": false,
+      "data": {
+        "asynchronous": false,
+        "evidence": "PPT e PDF, slides 16. Plano de dados; relação lógica manual. Latência cadastrada é parâmetro ilustrativo, sem benchmark.",
+        "inferred": false,
+        "latency": 10,
+        "protocol": "Cache catálogo"
+      },
+      "id": "app1-redis",
+      "source": "app1",
+      "target": "redis",
+      "type": "smoothstep"
+    },
+    {
+      "animated": false,
+      "data": {
+        "asynchronous": false,
+        "evidence": "PPT e PDF, slides 16. Plano de dados; relação lógica manual. Latência cadastrada é parâmetro ilustrativo, sem benchmark.",
+        "inferred": false,
+        "latency": 10,
+        "protocol": "Cache catálogo"
+      },
+      "id": "app2-redis",
+      "source": "app2",
+      "target": "redis",
+      "type": "smoothstep"
+    },
+    {
+      "animated": false,
+      "data": {
+        "asynchronous": false,
+        "evidence": "PPT e PDF, slides 16. Plano de dados; relação lógica manual. Latência cadastrada é parâmetro ilustrativo, sem benchmark.",
+        "inferred": false,
+        "latency": 10,
+        "protocol": "Cache catálogo"
+      },
+      "id": "app3-redis",
+      "source": "app3",
+      "target": "redis",
+      "type": "smoothstep"
+    },
+    {
+      "animated": true,
+      "data": {
+        "asynchronous": true,
+        "evidence": "PPT e PDF, slides 17. Plano de replicação; relação lógica manual. Latência cadastrada é parâmetro ilustrativo, sem benchmark.",
+        "inferred": false,
+        "latency": 0,
+        "protocol": "Replicação"
+      },
+      "id": "primary-read1",
+      "source": "primary",
+      "target": "read1",
+      "type": "smoothstep"
+    },
+    {
+      "animated": true,
+      "data": {
+        "asynchronous": true,
+        "evidence": "PPT e PDF, slides 17. Plano de replicação; relação lógica manual. Latência cadastrada é parâmetro ilustrativo, sem benchmark.",
+        "inferred": false,
+        "latency": 0,
+        "protocol": "Replicação"
+      },
+      "id": "primary-read2",
+      "source": "primary",
+      "target": "read2",
+      "type": "smoothstep"
+    },
+    {
+      "animated": false,
+      "data": {
+        "asynchronous": false,
+        "evidence": "PPT e PDF, slides 17. Plano de dados; relação lógica manual. Latência cadastrada é parâmetro ilustrativo, sem benchmark.",
+        "inferred": false,
+        "latency": 10,
+        "protocol": "Checkout / writer"
+      },
+      "id": "app1-primary",
+      "source": "app1",
+      "target": "primary",
+      "type": "smoothstep"
+    },
+    {
+      "animated": false,
+      "data": {
+        "asynchronous": false,
+        "evidence": "PPT e PDF, slides 17. Plano de dados; relação lógica manual. Latência cadastrada é parâmetro ilustrativo, sem benchmark.",
+        "inferred": false,
+        "latency": 10,
+        "protocol": "Leitura em MISS / A"
+      },
+      "id": "app1-read1",
+      "source": "app1",
+      "target": "read1",
+      "type": "smoothstep"
+    },
+    {
+      "animated": false,
+      "data": {
+        "asynchronous": false,
+        "evidence": "PPT e PDF, slides 17. Plano de dados; relação lógica manual. Latência cadastrada é parâmetro ilustrativo, sem benchmark.",
+        "inferred": false,
+        "latency": 10,
+        "protocol": "Leitura em MISS / B"
+      },
+      "id": "app1-read2",
+      "source": "app1",
+      "target": "read2",
+      "type": "smoothstep"
+    },
+    {
+      "animated": false,
+      "data": {
+        "asynchronous": false,
+        "evidence": "PPT e PDF, slides 17. Plano de dados; relação lógica manual. Latência cadastrada é parâmetro ilustrativo, sem benchmark.",
+        "inferred": false,
+        "latency": 10,
+        "protocol": "Checkout / writer"
+      },
+      "id": "app2-primary",
+      "source": "app2",
+      "target": "primary",
+      "type": "smoothstep"
+    },
+    {
+      "animated": false,
+      "data": {
+        "asynchronous": false,
+        "evidence": "PPT e PDF, slides 17. Plano de dados; relação lógica manual. Latência cadastrada é parâmetro ilustrativo, sem benchmark.",
+        "inferred": false,
+        "latency": 10,
+        "protocol": "Leitura em MISS / A"
+      },
+      "id": "app2-read1",
+      "source": "app2",
+      "target": "read1",
+      "type": "smoothstep"
+    },
+    {
+      "animated": false,
+      "data": {
+        "asynchronous": false,
+        "evidence": "PPT e PDF, slides 17. Plano de dados; relação lógica manual. Latência cadastrada é parâmetro ilustrativo, sem benchmark.",
+        "inferred": false,
+        "latency": 10,
+        "protocol": "Leitura em MISS / B"
+      },
+      "id": "app2-read2",
+      "source": "app2",
+      "target": "read2",
+      "type": "smoothstep"
+    },
+    {
+      "animated": false,
+      "data": {
+        "asynchronous": false,
+        "evidence": "PPT e PDF, slides 17. Plano de dados; relação lógica manual. Latência cadastrada é parâmetro ilustrativo, sem benchmark.",
+        "inferred": false,
+        "latency": 10,
+        "protocol": "Checkout / writer"
+      },
+      "id": "app3-primary",
+      "source": "app3",
+      "target": "primary",
+      "type": "smoothstep"
+    },
+    {
+      "animated": false,
+      "data": {
+        "asynchronous": false,
+        "evidence": "PPT e PDF, slides 17. Plano de dados; relação lógica manual. Latência cadastrada é parâmetro ilustrativo, sem benchmark.",
+        "inferred": false,
+        "latency": 10,
+        "protocol": "Leitura em MISS / A"
+      },
+      "id": "app3-read1",
+      "source": "app3",
+      "target": "read1",
+      "type": "smoothstep"
+    },
+    {
+      "animated": false,
+      "data": {
+        "asynchronous": false,
+        "evidence": "PPT e PDF, slides 17. Plano de dados; relação lógica manual. Latência cadastrada é parâmetro ilustrativo, sem benchmark.",
+        "inferred": false,
+        "latency": 10,
+        "protocol": "Leitura em MISS / B"
+      },
+      "id": "app3-read2",
+      "source": "app3",
+      "target": "read2",
+      "type": "smoothstep"
+    }
+  ],
+  "infrastructure": {
+    "bandwidthMbps": 1000,
+    "cpuPerHost": 4,
+    "demand": 20000,
+    "failedHosts": 0,
+    "hosts": 4,
+    "latencyMs": 10,
+    "memoryPerHost": 8192,
+    "packetLoss": 0,
+    "payloadKB": 32,
+    "workloadScope": "Recursos ilustrativos dos containers de catálogo, checkout e notificações (slide 19). CPU/RAM/req/min são parâmetros do exercício; os slides fixam perfil 95/5 e pico 10x. DB, cache, broker, borda e ferramentas gerenciadas fora deste orçamento. Não implantado."
+  },
+  "updatedAt": "2026-10-08T16:27:32.828Z",
+  "revisionDirty": false,
+  "revisions": [
+    {
+      "id": "santa-cecilia-visao-escala-v1",
+      "version": 1,
+      "message": "Visão 02 · Instâncias stateless, cache, writer e réplicas conforme o slide 17",
+      "createdAt": "2026-10-08T16:27:32.828Z",
+      "projectName": "Arquitetura Santa Cecília | 02 Escala",
+      "projectDescription": "VISÃO 02 | Evolução e escala. Zoom da segunda imagem (slide 17), retomando slides 13–16. Usuários, DNS/CDN e balanceador à esquerda; App 1/2/3 no centro; cache e writer/réplicas à direita. As três Apps são instâncias stateless equivalentes. Catálogo/busca usam cache; no MISS, leem de uma réplica. Checkout escreve diretamente no writer, sem depender de cache para decidir a compra. Replicação é assíncrona e pode atrasar. 95% leitura / 5% escrita é o perfil dos slides, não a distribuição calculada pelo simulador atual. Criptografia em repouso e menor privilégio. Complementa a visão 01; todas as peças se reúnem no projeto principal. Guia: docs/apresentacao/09-tres-visoes-da-arquitetura.md.",
+      "projectCategory": "software",
+      "projectStatus": "review",
+      "nodes": [
+        {
+          "data": {
+            "availability": 99.95,
+            "capacity": 200000,
+            "cpu": 30,
+            "currentLoad": 12000,
+            "deployment": {},
+            "description": "BORDA | Slides 3–4, 13, 19. Clientes em vários continentes e fusos; milhões de visitas/dia. Black Friday: pico 10x. Perfil do caso: 95% leitura (catálogo, busca, produtos) e 5% escrita. Checkout e pagamento têm maior impacto de negócio. Os slides não fixam req/min; 2.000/20.000 pertencem aos Labs. Perguntas: quantos usuários, de onde, qual pico e o que pode atrasar?",
+            "instances": 1,
+            "kind": "client",
+            "label": "Usuários globais",
+            "latency": 10,
+            "memory": 30,
+            "monthlyCost": 0,
+            "replicas": 1,
+            "storage": 2,
+            "technology": "Web / mobile"
+          },
+          "id": "users",
+          "position": {
+            "x": 0,
+            "y": 340
+          },
+          "type": "architecture"
+        },
+        {
+          "data": {
+            "availability": 99.95,
+            "capacity": 200000,
+            "cpu": 30,
+            "currentLoad": 12000,
+            "deployment": {},
+            "description": "BORDA | Slides 13, 18–19. Resolve o domínio e orienta o destino regional; não transporta cada requisição HTTPS. Consulta DNS e tráfego da aplicação são relações distintas. Health checks e política de roteamento participam da troca de região. Proximidade geográfica e continuidade são os motivos da peça. Exemplos de provedores vêm dos slides; a escolha concreta permanece aberta.",
+            "instances": 2,
+            "kind": "network",
+            "label": "DNS",
+            "latency": 10,
+            "memory": 30,
+            "monthlyCost": 0,
+            "replicas": 2,
+            "storage": 0,
+            "technology": "Route 53 / Cloud DNS"
+          },
+          "id": "dns",
+          "position": {
+            "x": 400,
+            "y": 0
+          },
+          "type": "architecture"
+        },
+        {
+          "data": {
+            "availability": 99.95,
+            "capacity": 200000,
+            "cpu": 30,
+            "currentLoad": 12000,
+            "deployment": {},
+            "description": "BORDA | Slides 13–14, 18–19. Imagens, CSS e JS perto do usuário, reduzindo latência e trabalho do backend. Slide 13: 90% do catálogo é conteúdo que não muda a cada visita; isso não equivale a uma taxa de cache HIT medida. Conteúdo dinâmico segue à entrada. Não cachear dados de pagamento/documentos. CloudFront e Cloudflare aparecem também como exemplos de alcance global no slide 18.",
+            "instances": 2,
+            "kind": "gateway",
+            "label": "CDN",
+            "latency": 10,
+            "memory": 30,
+            "monthlyCost": 0,
+            "replicas": 2,
+            "storage": 8,
+            "technology": "Cloudflare / Fastly"
+          },
+          "id": "cdn",
+          "position": {
+            "x": 400,
+            "y": 680
+          },
+          "type": "architecture"
+        },
+        {
+          "data": {
+            "availability": 99.95,
+            "capacity": 120000,
+            "cpu": 30,
+            "currentLoad": 12000,
+            "deployment": {},
+            "description": "ENTRADA | Slides 10, 14, 19, 21. Distribui tráfego entre instâncias saudáveis e retira quem não responde. TLS termina na entrada; uma nova sessão TLS protege o trecho até o backend, atendendo HTTPS em todos os trechos citados no slide. Rate limiting por identidade/origem; limites de conexão e timeout. Quando o pico excede o planejado, controlar acesso e preservar checkout/catálogo.",
+            "instances": 2,
+            "kind": "gateway",
+            "label": "Load Balancer",
+            "latency": 10,
+            "memory": 30,
+            "monthlyCost": 250,
+            "replicas": 2,
+            "storage": 1,
+            "technology": "L7 / HTTPS / rate limiting"
+          },
+          "id": "lb",
+          "position": {
+            "x": 800,
+            "y": 340
+          },
+          "type": "architecture"
+        },
+        {
+          "data": {
+            "availability": 99.95,
+            "capacity": 30000,
+            "cpu": 30,
+            "currentLoad": 6000,
+            "deployment": {},
+            "description": "APLICAÇÃO | Slides 15–17. Esta é uma das três cópias da mesma aplicação stateless; não é um serviço de domínio diferente. Qualquer cópia atende qualquer requisição, sem sessão em memória local. O balanceador distribui entre cópias saudáveis. Toda rota valida autenticação e autorização. Catálogo/busca consultam cache e, no MISS, uma réplica saudável; checkout grava diretamente no banco de escrita. Perfil do caso: 95% leitura e 5% escrita, sem impor taxa de HIT não medida. Adicionar cópias aumenta capacidade da aplicação; não remove automaticamente um gargalo de banco. Valores do bloco são ilustrativos.",
+            "instances": 1,
+            "kind": "service",
+            "label": "App 1",
+            "latency": 10,
+            "memory": 30,
+            "monthlyCost": 0,
+            "replicas": 1,
+            "storage": 8,
+            "technology": "Stateless"
+          },
+          "id": "app1",
+          "position": {
+            "x": 1200,
+            "y": 0
+          },
+          "type": "architecture"
+        },
+        {
+          "data": {
+            "availability": 99.95,
+            "capacity": 30000,
+            "cpu": 30,
+            "currentLoad": 6000,
+            "deployment": {},
+            "description": "APLICAÇÃO | Slides 15–17. Esta é uma das três cópias da mesma aplicação stateless; não é um serviço de domínio diferente. Qualquer cópia atende qualquer requisição, sem sessão em memória local. O balanceador distribui entre cópias saudáveis. Toda rota valida autenticação e autorização. Catálogo/busca consultam cache e, no MISS, uma réplica saudável; checkout grava diretamente no banco de escrita. Perfil do caso: 95% leitura e 5% escrita, sem impor taxa de HIT não medida. Adicionar cópias aumenta capacidade da aplicação; não remove automaticamente um gargalo de banco. Valores do bloco são ilustrativos.",
+            "instances": 1,
+            "kind": "service",
+            "label": "App 2",
+            "latency": 10,
+            "memory": 30,
+            "monthlyCost": 0,
+            "replicas": 1,
+            "storage": 8,
+            "technology": "Stateless"
+          },
+          "id": "app2",
+          "position": {
+            "x": 1200,
+            "y": 340
+          },
+          "type": "architecture"
+        },
+        {
+          "data": {
+            "availability": 99.95,
+            "capacity": 30000,
+            "cpu": 30,
+            "currentLoad": 6000,
+            "deployment": {},
+            "description": "APLICAÇÃO | Slides 15–17. Esta é uma das três cópias da mesma aplicação stateless; não é um serviço de domínio diferente. Qualquer cópia atende qualquer requisição, sem sessão em memória local. O balanceador distribui entre cópias saudáveis. Toda rota valida autenticação e autorização. Catálogo/busca consultam cache e, no MISS, uma réplica saudável; checkout grava diretamente no banco de escrita. Perfil do caso: 95% leitura e 5% escrita, sem impor taxa de HIT não medida. Adicionar cópias aumenta capacidade da aplicação; não remove automaticamente um gargalo de banco. Valores do bloco são ilustrativos.",
+            "instances": 1,
+            "kind": "service",
+            "label": "App 3",
+            "latency": 10,
+            "memory": 30,
+            "monthlyCost": 0,
+            "replicas": 1,
+            "storage": 8,
+            "technology": "Stateless"
+          },
+          "id": "app3",
+          "position": {
+            "x": 1200,
+            "y": 680
+          },
+          "type": "architecture"
+        },
+        {
+          "data": {
+            "availability": 99.95,
+            "capacity": 80000,
+            "cpu": 30,
+            "currentLoad": 12000,
+            "deployment": {},
+            "description": "DADOS | Slides 9, 16–17, 19. Memória rápida para consultas repetidas de catálogo, produto e busca; HIT evita SQL, MISS usa uma réplica. Nunca cachear pagamento ou documento; informação pessoal requer TTL curto, conforme o slide 16. TTL/invalidação são políticas a definir; nenhum valor em segundos é fixado pelos slides. Cache é reconstruível, não fonte de verdade para compra. Falha pede fallback com limite de carga.",
+            "instances": 2,
+            "kind": "cache",
+            "label": "Cache de catálogo",
+            "latency": 10,
+            "memory": 30,
+            "monthlyCost": 160,
+            "replicas": 2,
+            "storage": 12,
+            "technology": "Redis / Memcached"
+          },
+          "id": "redis",
+          "position": {
+            "x": 1660,
+            "y": 340
+          },
+          "type": "architecture"
+        },
+        {
+          "data": {
+            "availability": 99.95,
+            "capacity": 20000,
+            "cpu": 30,
+            "currentLoad": 4000,
+            "deployment": {},
+            "description": "DADOS | Slides 11, 17, 19. Fonte da verdade para checkout, pagamento confirmado e estoque final. Uma escrita autoritativa; réplicas de leitura recebem propagação e podem atrasar. Criptografia em repouso e credenciais de menor privilégio. PostgreSQL, MySQL e SQL Server são alternativas do slide; o schema de oito tabelas é aprofundamento do nosso exemplo, não requisito imposto pela palestra. Standby/backup complementam HA; validar recuperação.",
+            "instances": 2,
+            "kind": "database",
+            "label": "Banco de escrita",
+            "latency": 10,
+            "memory": 30,
+            "monthlyCost": 400,
+            "replicas": 2,
+            "schema": {
+              "engine": "PostgreSQL",
+              "paradigm": "relational",
+              "tables": [
+                {
+                  "columns": [
+                    {
+                      "id": "products-id",
+                      "name": "id",
+                      "nullable": false,
+                      "primaryKey": true,
+                      "type": "uuid",
+                      "unique": true
+                    },
+                    {
+                      "id": "products-sku",
+                      "name": "sku",
+                      "nullable": false,
+                      "primaryKey": false,
+                      "type": "varchar",
+                      "unique": true
+                    },
+                    {
+                      "id": "products-name",
+                      "name": "name",
+                      "nullable": false,
+                      "primaryKey": false,
+                      "type": "varchar",
+                      "unique": false
+                    },
+                    {
+                      "id": "products-price",
+                      "name": "price",
+                      "nullable": false,
+                      "primaryKey": false,
+                      "type": "decimal",
+                      "unique": false
+                    }
+                  ],
+                  "description": "Catálogo público",
+                  "id": "products",
+                  "indexes": [],
+                  "name": "products"
+                },
+                {
+                  "columns": [
+                    {
+                      "id": "inventory-product_id",
+                      "name": "product_id",
+                      "nullable": false,
+                      "primaryKey": true,
+                      "references": {
+                        "columnId": "products-id",
+                        "tableId": "products"
+                      },
+                      "type": "uuid",
+                      "unique": true
+                    },
+                    {
+                      "id": "inventory-available",
+                      "name": "available",
+                      "nullable": false,
+                      "primaryKey": false,
+                      "type": "integer",
+                      "unique": false
+                    },
+                    {
+                      "id": "inventory-version",
+                      "name": "version",
+                      "nullable": false,
+                      "primaryKey": false,
+                      "type": "integer",
+                      "unique": false
+                    }
+                  ],
+                  "description": "Reserva autoritativa no checkout",
+                  "id": "inventory",
+                  "indexes": [],
+                  "name": "inventory"
+                },
+                {
+                  "columns": [
+                    {
+                      "id": "orders-id",
+                      "name": "id",
+                      "nullable": false,
+                      "primaryKey": true,
+                      "type": "uuid",
+                      "unique": true
+                    },
+                    {
+                      "id": "orders-idempotency_key",
+                      "name": "idempotency_key",
+                      "nullable": false,
+                      "primaryKey": false,
+                      "type": "varchar",
+                      "unique": true
+                    },
+                    {
+                      "id": "orders-status",
+                      "name": "status",
+                      "nullable": false,
+                      "primaryKey": false,
+                      "type": "varchar",
+                      "unique": false
+                    },
+                    {
+                      "id": "orders-total",
+                      "name": "total",
+                      "nullable": false,
+                      "primaryKey": false,
+                      "type": "decimal",
+                      "unique": false
+                    },
+                    {
+                      "id": "orders-created_at",
+                      "name": "created_at",
+                      "nullable": false,
+                      "primaryKey": false,
+                      "type": "timestamp",
+                      "unique": false
+                    },
+                    {
+                      "id": "orders-owner_subject",
+                      "name": "owner_subject",
+                      "nullable": false,
+                      "primaryKey": false,
+                      "type": "varchar",
+                      "unique": false
+                    },
+                    {
+                      "id": "orders-request_hash",
+                      "name": "request_hash",
+                      "nullable": false,
+                      "primaryKey": false,
+                      "type": "varchar",
+                      "unique": false
+                    },
+                    {
+                      "id": "orders-currency",
+                      "name": "currency",
+                      "nullable": false,
+                      "primaryKey": false,
+                      "type": "varchar",
+                      "unique": false
+                    },
+                    {
+                      "id": "orders-updated_at",
+                      "name": "updated_at",
+                      "nullable": false,
+                      "primaryKey": false,
+                      "type": "timestamp",
+                      "unique": false
+                    }
+                  ],
+                  "description": "Um pedido por chave de idempotência",
+                  "id": "orders",
+                  "indexes": [
+                    [
+                      "orders-owner_subject",
+                      "orders-created_at"
+                    ]
+                  ],
+                  "name": "orders"
+                },
+                {
+                  "columns": [
+                    {
+                      "id": "order_items-id",
+                      "name": "id",
+                      "nullable": false,
+                      "primaryKey": true,
+                      "type": "uuid",
+                      "unique": true
+                    },
+                    {
+                      "id": "order_items-order_id",
+                      "name": "order_id",
+                      "nullable": false,
+                      "primaryKey": false,
+                      "references": {
+                        "columnId": "orders-id",
+                        "tableId": "orders"
+                      },
+                      "type": "uuid",
+                      "unique": false
+                    },
+                    {
+                      "id": "order_items-product_id",
+                      "name": "product_id",
+                      "nullable": false,
+                      "primaryKey": false,
+                      "references": {
+                        "columnId": "products-id",
+                        "tableId": "products"
+                      },
+                      "type": "uuid",
+                      "unique": false
+                    },
+                    {
+                      "id": "order_items-quantity",
+                      "name": "quantity",
+                      "nullable": false,
+                      "primaryKey": false,
+                      "type": "integer",
+                      "unique": false
+                    },
+                    {
+                      "id": "order_items-unit_price",
+                      "name": "unit_price",
+                      "nullable": false,
+                      "primaryKey": false,
+                      "type": "decimal",
+                      "unique": false
+                    }
+                  ],
+                  "description": "Itens do pedido",
+                  "id": "order_items",
+                  "indexes": [
+                    [
+                      "order_items-order_id"
+                    ],
+                    [
+                      "order_items-product_id"
+                    ]
+                  ],
+                  "name": "order_items"
+                },
+                {
+                  "columns": [
+                    {
+                      "id": "payment_events-id",
+                      "name": "id",
+                      "nullable": false,
+                      "primaryKey": true,
+                      "type": "uuid",
+                      "unique": true
+                    },
+                    {
+                      "id": "payment_events-provider_event_id",
+                      "name": "provider_event_id",
+                      "nullable": false,
+                      "primaryKey": false,
+                      "type": "varchar",
+                      "unique": true
+                    },
+                    {
+                      "id": "payment_events-order_id",
+                      "name": "order_id",
+                      "nullable": false,
+                      "primaryKey": false,
+                      "references": {
+                        "columnId": "orders-id",
+                        "tableId": "orders"
+                      },
+                      "type": "uuid",
+                      "unique": false
+                    },
+                    {
+                      "id": "payment_events-status",
+                      "name": "status",
+                      "nullable": false,
+                      "primaryKey": false,
+                      "type": "varchar",
+                      "unique": false
+                    },
+                    {
+                      "id": "payment_events-received_at",
+                      "name": "received_at",
+                      "nullable": false,
+                      "primaryKey": false,
+                      "type": "timestamp",
+                      "unique": false
+                    }
+                  ],
+                  "description": "Deduplicar webhooks e correlacionar pedido",
+                  "id": "payment_events",
+                  "indexes": [
+                    [
+                      "payment_events-order_id"
+                    ]
+                  ],
+                  "name": "payment_events"
+                },
+                {
+                  "columns": [
+                    {
+                      "id": "outbox-id",
+                      "name": "id",
+                      "nullable": false,
+                      "primaryKey": true,
+                      "type": "uuid",
+                      "unique": true
+                    },
+                    {
+                      "id": "outbox-order_id",
+                      "name": "order_id",
+                      "nullable": false,
+                      "primaryKey": false,
+                      "references": {
+                        "columnId": "orders-id",
+                        "tableId": "orders"
+                      },
+                      "type": "uuid",
+                      "unique": false
+                    },
+                    {
+                      "id": "outbox-event_type",
+                      "name": "event_type",
+                      "nullable": false,
+                      "primaryKey": false,
+                      "type": "varchar",
+                      "unique": false
+                    },
+                    {
+                      "id": "outbox-created_at",
+                      "name": "created_at",
+                      "nullable": false,
+                      "primaryKey": false,
+                      "type": "timestamp",
+                      "unique": false
+                    },
+                    {
+                      "id": "outbox-published",
+                      "name": "published",
+                      "nullable": false,
+                      "primaryKey": false,
+                      "type": "boolean",
+                      "unique": false
+                    },
+                    {
+                      "id": "outbox-payload",
+                      "name": "payload",
+                      "nullable": false,
+                      "primaryKey": false,
+                      "type": "json",
+                      "unique": false
+                    },
+                    {
+                      "id": "outbox-attempts",
+                      "name": "attempts",
+                      "nullable": false,
+                      "primaryKey": false,
+                      "type": "integer",
+                      "unique": false
+                    },
+                    {
+                      "id": "outbox-published_at",
+                      "name": "published_at",
+                      "nullable": true,
+                      "primaryKey": false,
+                      "type": "timestamp",
+                      "unique": false
+                    }
+                  ],
+                  "description": "Evento na mesma transação do pedido",
+                  "id": "outbox",
+                  "indexes": [
+                    [
+                      "outbox-order_id"
+                    ],
+                    [
+                      "outbox-published",
+                      "outbox-created_at"
+                    ]
+                  ],
+                  "name": "outbox"
+                },
+                {
+                  "columns": [
+                    {
+                      "id": "reservations-id",
+                      "name": "id",
+                      "nullable": false,
+                      "primaryKey": true,
+                      "type": "uuid",
+                      "unique": true
+                    },
+                    {
+                      "id": "reservations-order_id",
+                      "name": "order_id",
+                      "nullable": false,
+                      "primaryKey": false,
+                      "references": {
+                        "columnId": "orders-id",
+                        "tableId": "orders"
+                      },
+                      "type": "uuid",
+                      "unique": false
+                    },
+                    {
+                      "id": "reservations-product_id",
+                      "name": "product_id",
+                      "nullable": false,
+                      "primaryKey": false,
+                      "references": {
+                        "columnId": "products-id",
+                        "tableId": "products"
+                      },
+                      "type": "uuid",
+                      "unique": false
+                    },
+                    {
+                      "id": "reservations-quantity",
+                      "name": "quantity",
+                      "nullable": false,
+                      "primaryKey": false,
+                      "type": "integer",
+                      "unique": false
+                    },
+                    {
+                      "id": "reservations-status",
+                      "name": "status",
+                      "nullable": false,
+                      "primaryKey": false,
+                      "type": "varchar",
+                      "unique": false
+                    },
+                    {
+                      "id": "reservations-expires_at",
+                      "name": "expires_at",
+                      "nullable": false,
+                      "primaryKey": false,
+                      "type": "timestamp",
+                      "unique": false
+                    }
+                  ],
+                  "description": "Reserva por pedido/produto, com expiração e compensação idempotente; estado deve ser reconciliado com pagamento.",
+                  "id": "reservations",
+                  "indexes": [
+                    [
+                      "reservations-order_id"
+                    ],
+                    [
+                      "reservations-product_id"
+                    ],
+                    [
+                      "reservations-status",
+                      "reservations-expires_at"
+                    ]
+                  ],
+                  "name": "reservations"
+                },
+                {
+                  "columns": [
+                    {
+                      "id": "processed_events-event_id",
+                      "name": "event_id",
+                      "nullable": false,
+                      "primaryKey": true,
+                      "references": {
+                        "columnId": "outbox-id",
+                        "tableId": "outbox"
+                      },
+                      "type": "uuid",
+                      "unique": false
+                    },
+                    {
+                      "id": "processed_events-consumer_name",
+                      "name": "consumer_name",
+                      "nullable": false,
+                      "primaryKey": true,
+                      "type": "varchar",
+                      "unique": false
+                    },
+                    {
+                      "id": "processed_events-processed_at",
+                      "name": "processed_at",
+                      "nullable": false,
+                      "primaryKey": false,
+                      "type": "timestamp",
+                      "unique": false
+                    }
+                  ],
+                  "description": "Chave composta deduplica o mesmo evento por consumidor. Efeito externo exige suporte de idempotência próprio.",
+                  "id": "processed_events",
+                  "indexes": [],
+                  "name": "processed_events"
+                }
+              ]
+            },
+            "storage": 42,
+            "technology": "PostgreSQL / SQL relacional"
+          },
+          "id": "primary",
+          "position": {
+            "x": 2180,
+            "y": -100
+          },
+          "type": "architecture"
+        },
+        {
+          "data": {
+            "availability": 99.95,
+            "capacity": 30000,
+            "cpu": 30,
+            "currentLoad": 6000,
+            "deployment": {},
+            "description": "DADOS | Slides 11, 17–18. Réplica próxima da aplicação na região principal. Catálogo/busca em MISS podem usar um destino saudável; réplicas A/B são alternativas, não duas leituras obrigatórias da mesma consulta. Monitorar atraso; nenhum checkout decide estoque por dado atrasado. Separação de leitura e escrita acompanha o perfil 95/5 do caso.",
+            "instances": 1,
+            "kind": "database",
+            "label": "Réplica de leitura A",
+            "latency": 10,
+            "memory": 30,
+            "monthlyCost": 180,
+            "replicas": 1,
+            "storage": 42,
+            "technology": "SQL / leitura eventual"
+          },
+          "id": "read1",
+          "position": {
+            "x": 2180,
+            "y": 340
+          },
+          "type": "architecture"
+        },
+        {
+          "data": {
+            "availability": 99.95,
+            "capacity": 30000,
+            "cpu": 30,
+            "currentLoad": 6000,
+            "deployment": {},
+            "description": "DADOS | Slides 11, 17–18. Segunda réplica de leitura, usada para ilustrar proximidade regional. Exemplo da palestra: leitura do cliente europeu em 40 ms, comparada a 220 ms cruzando o Atlântico. São valores do exemplo dos slides, não latências medidas nesta preparação. A réplica pode atrasar; não vira outro writer automaticamente. Escolha do destino respeita região e política de dados.",
+            "instances": 1,
+            "kind": "database",
+            "label": "Réplica de leitura B",
+            "latency": 10,
+            "memory": 30,
+            "monthlyCost": 180,
+            "replicas": 1,
+            "storage": 42,
+            "technology": "SQL / região próxima"
+          },
+          "id": "read2",
+          "position": {
+            "x": 2180,
+            "y": 780
+          },
+          "type": "architecture"
+        }
+      ],
+      "edges": [
+        {
+          "animated": false,
+          "data": {
+            "asynchronous": false,
+            "evidence": "PPT e PDF, slides 13. Plano de controle; relação lógica manual. Latência cadastrada é parâmetro ilustrativo, sem benchmark.",
+            "inferred": false,
+            "latency": 0,
+            "protocol": "Resolver domínio"
+          },
+          "id": "users-dns",
+          "source": "users",
+          "target": "dns",
+          "type": "smoothstep"
+        },
+        {
+          "animated": false,
+          "data": {
+            "asynchronous": false,
+            "evidence": "PPT e PDF, slides 13. Plano de dados; relação lógica manual. Latência cadastrada é parâmetro ilustrativo, sem benchmark.",
+            "inferred": false,
+            "latency": 10,
+            "protocol": "Estático próximo"
+          },
+          "id": "users-cdn",
+          "source": "users",
+          "target": "cdn",
+          "type": "smoothstep"
+        },
+        {
+          "animated": false,
+          "data": {
+            "asynchronous": false,
+            "evidence": "PPT e PDF, slides 14. Plano de dados; relação lógica manual. Latência cadastrada é parâmetro ilustrativo, sem benchmark.",
+            "inferred": false,
+            "latency": 10,
+            "protocol": "Dinâmico / HTTPS"
+          },
+          "id": "cdn-lb",
+          "source": "cdn",
+          "target": "lb",
+          "type": "smoothstep"
+        },
+        {
+          "animated": false,
+          "data": {
+            "asynchronous": false,
+            "evidence": "PPT e PDF, slides 15. Plano de dados; relação lógica manual. Latência cadastrada é parâmetro ilustrativo, sem benchmark.",
+            "inferred": false,
+            "latency": 10,
+            "protocol": "Distribuir / health check"
+          },
+          "id": "lb-app1",
+          "source": "lb",
+          "target": "app1",
+          "type": "smoothstep"
+        },
+        {
+          "animated": false,
+          "data": {
+            "asynchronous": false,
+            "evidence": "PPT e PDF, slides 15. Plano de dados; relação lógica manual. Latência cadastrada é parâmetro ilustrativo, sem benchmark.",
+            "inferred": false,
+            "latency": 10,
+            "protocol": "Distribuir / health check"
+          },
+          "id": "lb-app2",
+          "source": "lb",
+          "target": "app2",
+          "type": "smoothstep"
+        },
+        {
+          "animated": false,
+          "data": {
+            "asynchronous": false,
+            "evidence": "PPT e PDF, slides 15. Plano de dados; relação lógica manual. Latência cadastrada é parâmetro ilustrativo, sem benchmark.",
+            "inferred": false,
+            "latency": 10,
+            "protocol": "Distribuir / health check"
+          },
+          "id": "lb-app3",
+          "source": "lb",
+          "target": "app3",
+          "type": "smoothstep"
+        },
+        {
+          "animated": false,
+          "data": {
+            "asynchronous": false,
+            "evidence": "PPT e PDF, slides 16. Plano de dados; relação lógica manual. Latência cadastrada é parâmetro ilustrativo, sem benchmark.",
+            "inferred": false,
+            "latency": 10,
+            "protocol": "Cache catálogo"
+          },
+          "id": "app1-redis",
+          "source": "app1",
+          "target": "redis",
+          "type": "smoothstep"
+        },
+        {
+          "animated": false,
+          "data": {
+            "asynchronous": false,
+            "evidence": "PPT e PDF, slides 16. Plano de dados; relação lógica manual. Latência cadastrada é parâmetro ilustrativo, sem benchmark.",
+            "inferred": false,
+            "latency": 10,
+            "protocol": "Cache catálogo"
+          },
+          "id": "app2-redis",
+          "source": "app2",
+          "target": "redis",
+          "type": "smoothstep"
+        },
+        {
+          "animated": false,
+          "data": {
+            "asynchronous": false,
+            "evidence": "PPT e PDF, slides 16. Plano de dados; relação lógica manual. Latência cadastrada é parâmetro ilustrativo, sem benchmark.",
+            "inferred": false,
+            "latency": 10,
+            "protocol": "Cache catálogo"
+          },
+          "id": "app3-redis",
+          "source": "app3",
+          "target": "redis",
+          "type": "smoothstep"
+        },
+        {
+          "animated": true,
+          "data": {
+            "asynchronous": true,
+            "evidence": "PPT e PDF, slides 17. Plano de replicação; relação lógica manual. Latência cadastrada é parâmetro ilustrativo, sem benchmark.",
+            "inferred": false,
+            "latency": 0,
+            "protocol": "Replicação"
+          },
+          "id": "primary-read1",
+          "source": "primary",
+          "target": "read1",
+          "type": "smoothstep"
+        },
+        {
+          "animated": true,
+          "data": {
+            "asynchronous": true,
+            "evidence": "PPT e PDF, slides 17. Plano de replicação; relação lógica manual. Latência cadastrada é parâmetro ilustrativo, sem benchmark.",
+            "inferred": false,
+            "latency": 0,
+            "protocol": "Replicação"
+          },
+          "id": "primary-read2",
+          "source": "primary",
+          "target": "read2",
+          "type": "smoothstep"
+        },
+        {
+          "animated": false,
+          "data": {
+            "asynchronous": false,
+            "evidence": "PPT e PDF, slides 17. Plano de dados; relação lógica manual. Latência cadastrada é parâmetro ilustrativo, sem benchmark.",
+            "inferred": false,
+            "latency": 10,
+            "protocol": "Checkout / writer"
+          },
+          "id": "app1-primary",
+          "source": "app1",
+          "target": "primary",
+          "type": "smoothstep"
+        },
+        {
+          "animated": false,
+          "data": {
+            "asynchronous": false,
+            "evidence": "PPT e PDF, slides 17. Plano de dados; relação lógica manual. Latência cadastrada é parâmetro ilustrativo, sem benchmark.",
+            "inferred": false,
+            "latency": 10,
+            "protocol": "Leitura em MISS / A"
+          },
+          "id": "app1-read1",
+          "source": "app1",
+          "target": "read1",
+          "type": "smoothstep"
+        },
+        {
+          "animated": false,
+          "data": {
+            "asynchronous": false,
+            "evidence": "PPT e PDF, slides 17. Plano de dados; relação lógica manual. Latência cadastrada é parâmetro ilustrativo, sem benchmark.",
+            "inferred": false,
+            "latency": 10,
+            "protocol": "Leitura em MISS / B"
+          },
+          "id": "app1-read2",
+          "source": "app1",
+          "target": "read2",
+          "type": "smoothstep"
+        },
+        {
+          "animated": false,
+          "data": {
+            "asynchronous": false,
+            "evidence": "PPT e PDF, slides 17. Plano de dados; relação lógica manual. Latência cadastrada é parâmetro ilustrativo, sem benchmark.",
+            "inferred": false,
+            "latency": 10,
+            "protocol": "Checkout / writer"
+          },
+          "id": "app2-primary",
+          "source": "app2",
+          "target": "primary",
+          "type": "smoothstep"
+        },
+        {
+          "animated": false,
+          "data": {
+            "asynchronous": false,
+            "evidence": "PPT e PDF, slides 17. Plano de dados; relação lógica manual. Latência cadastrada é parâmetro ilustrativo, sem benchmark.",
+            "inferred": false,
+            "latency": 10,
+            "protocol": "Leitura em MISS / A"
+          },
+          "id": "app2-read1",
+          "source": "app2",
+          "target": "read1",
+          "type": "smoothstep"
+        },
+        {
+          "animated": false,
+          "data": {
+            "asynchronous": false,
+            "evidence": "PPT e PDF, slides 17. Plano de dados; relação lógica manual. Latência cadastrada é parâmetro ilustrativo, sem benchmark.",
+            "inferred": false,
+            "latency": 10,
+            "protocol": "Leitura em MISS / B"
+          },
+          "id": "app2-read2",
+          "source": "app2",
+          "target": "read2",
+          "type": "smoothstep"
+        },
+        {
+          "animated": false,
+          "data": {
+            "asynchronous": false,
+            "evidence": "PPT e PDF, slides 17. Plano de dados; relação lógica manual. Latência cadastrada é parâmetro ilustrativo, sem benchmark.",
+            "inferred": false,
+            "latency": 10,
+            "protocol": "Checkout / writer"
+          },
+          "id": "app3-primary",
+          "source": "app3",
+          "target": "primary",
+          "type": "smoothstep"
+        },
+        {
+          "animated": false,
+          "data": {
+            "asynchronous": false,
+            "evidence": "PPT e PDF, slides 17. Plano de dados; relação lógica manual. Latência cadastrada é parâmetro ilustrativo, sem benchmark.",
+            "inferred": false,
+            "latency": 10,
+            "protocol": "Leitura em MISS / A"
+          },
+          "id": "app3-read1",
+          "source": "app3",
+          "target": "read1",
+          "type": "smoothstep"
+        },
+        {
+          "animated": false,
+          "data": {
+            "asynchronous": false,
+            "evidence": "PPT e PDF, slides 17. Plano de dados; relação lógica manual. Latência cadastrada é parâmetro ilustrativo, sem benchmark.",
+            "inferred": false,
+            "latency": 10,
+            "protocol": "Leitura em MISS / B"
+          },
+          "id": "app3-read2",
+          "source": "app3",
+          "target": "read2",
+          "type": "smoothstep"
+        }
+      ],
+      "infrastructure": {
+        "bandwidthMbps": 1000,
+        "cpuPerHost": 4,
+        "demand": 20000,
+        "failedHosts": 0,
+        "hosts": 4,
+        "latencyMs": 10,
+        "memoryPerHost": 8192,
+        "packetLoss": 0,
+        "payloadKB": 32,
+        "workloadScope": "Recursos ilustrativos dos containers de catálogo, checkout e notificações (slide 19). CPU/RAM/req/min são parâmetros do exercício; os slides fixam perfil 95/5 e pico 10x. DB, cache, broker, borda e ferramentas gerenciadas fora deste orçamento. Não implantado."
+      }
+    }
+  ]
+}

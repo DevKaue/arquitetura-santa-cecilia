@@ -1,0 +1,178 @@
+{
+  "createdAt": "2026-10-08T16:27:32.828Z",
+  "sources": [
+    {
+      "filename": "Como projetar sistemas escaláveis, seguros e preparados para o mundo real.pptx",
+      "sha256": "82f8c08c9c4c8cdf957c174af9a93313b71a21df60f9435904e2328b8c9ec728",
+      "pagesOrSlides": 25
+    },
+    {
+      "filename": "Como projetar sistemas escaláveis, seguros e preparados para o mundo real.pdf",
+      "sha256": "a7d8cfb8ab5574c9683c3b8c06b18c2de6ec76746125b030bf58971932cdd0ce",
+      "pagesOrSlides": 25
+    }
+  ],
+  "mainPreserved": {
+    "id": "santa-cecilia-ecommerce",
+    "version": 22,
+    "nodes": 23,
+    "edges": 40,
+    "revisionDirty": true
+  },
+  "views": [
+    {
+      "file": "04-visao-camadas.buildarch.json",
+      "id": "santa-cecilia-visao-camadas",
+      "name": "Arquitetura Santa Cecília | 01 Camadas",
+      "nodes": 18,
+      "edges": 26,
+      "sourceSlides": [
+        19
+      ],
+      "positions": {
+        "users": {
+          "x": 0,
+          "y": 0
+        },
+        "waf": {
+          "x": 400,
+          "y": 0
+        },
+        "cdn": {
+          "x": 800,
+          "y": 0
+        },
+        "dns": {
+          "x": 1200,
+          "y": 0
+        },
+        "lb": {
+          "x": 400,
+          "y": 330
+        },
+        "identity": {
+          "x": 1200,
+          "y": 330
+        },
+        "orchestrator": {
+          "x": 0,
+          "y": 620
+        },
+        "catalog": {
+          "x": 0,
+          "y": 950
+        },
+        "checkout": {
+          "x": 400,
+          "y": 950
+        },
+        "worker": {
+          "x": 800,
+          "y": 950
+        },
+        "autoscaler": {
+          "x": 1200,
+          "y": 950
+        },
+        "primary": {
+          "x": 0,
+          "y": 1300
+        },
+        "redis": {
+          "x": 400,
+          "y": 1300
+        },
+        "queue": {
+          "x": 800,
+          "y": 1300
+        },
+        "metrics": {
+          "x": 1700,
+          "y": 200
+        },
+        "logs": {
+          "x": 1700,
+          "y": 540
+        },
+        "delivery": {
+          "x": 1700,
+          "y": 880
+        },
+        "staticanalysis": {
+          "x": 1700,
+          "y": 1220
+        }
+      }
+    },
+    {
+      "file": "05-visao-escalabilidade.buildarch.json",
+      "id": "santa-cecilia-visao-escala",
+      "name": "Arquitetura Santa Cecília | 02 Escala",
+      "nodes": 11,
+      "edges": 20,
+      "sourceSlides": [
+        13,
+        14,
+        15,
+        16,
+        17
+      ],
+      "positions": {
+        "users": {
+          "x": 0,
+          "y": 340
+        },
+        "dns": {
+          "x": 400,
+          "y": 0
+        },
+        "cdn": {
+          "x": 400,
+          "y": 680
+        },
+        "lb": {
+          "x": 800,
+          "y": 340
+        },
+        "app1": {
+          "x": 1200,
+          "y": 0
+        },
+        "app2": {
+          "x": 1200,
+          "y": 340
+        },
+        "app3": {
+          "x": 1200,
+          "y": 680
+        },
+        "redis": {
+          "x": 1660,
+          "y": 340
+        },
+        "primary": {
+          "x": 2180,
+          "y": -100
+        },
+        "read1": {
+          "x": 2180,
+          "y": 340
+        },
+        "read2": {
+          "x": 2180,
+          "y": 780
+        }
+      }
+    }
+  ],
+  "verification": {
+    "officialParser": "Seis backups aceitos; posições, descrições e revisões preservadas na leitura.",
+    "existingDesktopProjects": 6,
+    "existingProjectsContentPreserved": true,
+    "desktopProjectCount": 8,
+    "mainChanges": "Apenas updatedAt modificado pelo aplicativo ao reabrir; conteúdo e alterações pendentes preservados.",
+    "nodeOverlap": "Nenhuma sobreposição entre envelopes de 360 por 240 nas duas novas visões.",
+    "desktopVisualCapture": "Não disponível: window capture timed out.",
+    "loadModel": "Visão 02 acíclica aceita configuração de 100000 usuários, 600 ações/min, 60s e falha no writer; só configuração validada. Rotas igualmente divididas; sem HIT/MISS, 95/5 ou failover real."
+  }
+}

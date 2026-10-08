@@ -7,7 +7,7 @@ import { parseDocument } from 'yaml';
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
 const read = (name) => fs.readFileSync(path.join(root, name), 'utf8');
 const files = fs.readdirSync(path.join(root, 'buildarch')).filter((f) => f.endsWith('.buildarch.json'));
-assert.equal(files.length, 4, 'São esperados a arquitetura final e três Labs.');
+assert.equal(files.length, 6, 'São esperados o principal, três Labs e duas visões complementares.');
 
 function verifyGraph(project) {
   const ids = new Set(project.nodes.map((node) => node.id));
@@ -84,6 +84,35 @@ for (const file of files) {
       }
     }
     assert.ok(byId.has('reservations') && byId.has('processed_events') && byId.has('outbox'));
+  } else if (file.startsWith('04-') || file.startsWith('05-')) {
+    const record = JSON.parse(read('docs/validacao/visoes-complementares.json'));
+    const view = record.views.find((v) => v.file === file);
+    assert.ok(view);
+    assert.equal(project.id, view.id);
+    assert.equal(project.name, view.name);
+    assert.equal(project.version, 1);
+    assert.equal(project.revisions.length, 1);
+    assert.equal(project.revisionDirty, false);
+    assert.equal(project.nodes.length, view.nodes);
+    assert.equal(project.edges.length, view.edges);
+    for (const node of project.nodes) {
+      assert.deepEqual(node.position, view.positions[node.id]);
+      assert.ok(node.data.description.length <= 800);
+    }
+    if (file.startsWith('04-')) {
+      assert.deepEqual(project.nodes.map(n => n.id).sort(), ['users','waf','cdn','dns','lb','identity','orchestrator','catalog','checkout','worker','autoscaler','primary','redis','queue','metrics','logs','delivery','staticanalysis'].sort());
+      assert.ok(project.edges.some(e => e.source === 'checkout' && e.target === 'primary'));
+      assert.ok(project.edges.some(e => e.source === 'queue' && e.target === 'worker'));
+      assert.ok(!project.edges.some(e => e.source === 'cdn' && e.target === 'dns'), 'DNS não deve virar salto HTTP após CDN.');
+    } else {
+      for (const id of ['app1', 'app2', 'app3']) {
+        assert.equal(project.nodes.find(n => n.id === id).data.instances, 1);
+        assert.ok(project.edges.some(e => e.source === 'lb' && e.target === id));
+        for (const target of ['redis','primary','read1','read2']) assert.ok(project.edges.some(e => e.source === id && e.target === target));
+      }
+      assert.ok(!project.edges.some(e => e.source === 'redis' && e.target === 'primary'), 'Checkout não deve escrever através do cache.');
+      for (const target of ['read1','read2']) assert.ok(project.edges.some(e => e.source === 'primary' && e.target === target && e.data.asynchronous));
+    }
   } else {
     assert.equal(project.nodes.length, 4);
     assert.equal(project.edges.length, 3);
@@ -111,5 +140,5 @@ const results = JSON.parse(read('docs/validacao/resultados-verificados.json'));
 assert.equal(results.length, 3);
 assert.equal(results[0].simulations.find((r) => r.pattern === 'spike').latency, results[1].simulations.find((r) => r.pattern === 'spike').latency);
 assert.ok(results[2].live.pending < 0.001);
-console.log('Conferidos: quatro backups, histórico, oito tabelas/FKs, contratos dos Labs e nove serviços do Compose.');
+console.log('Conferidos: seis backups, duas visões complementares, histórico, oito tabelas/FKs, contratos dos Labs e nove serviços do Compose.');
 console.log('Esta verificação não executa containers nem substitui testes do workflow de compra.');

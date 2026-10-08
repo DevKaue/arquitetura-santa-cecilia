@@ -3,6 +3,8 @@
 
 **Principal: v22 · 23 blocos · 40 relações · camadas e jornadas.** Enquadrar o canvas e conferir **Salvo agora**. A sequência segue os slides; ajustar a duração durante o ensaio conjunto.
 
+**Alternativa com três mapas:** seletor de projetos → **01 Camadas** (responsabilidades) → **02 Escala** (stateless, cache, writer/réplicas) → **Arquitetura Santa Cecília** (síntese). Transições: “onde cada responsabilidade fica” → “como cada parte cresce” → “como tudo opera junto”. [Falas e ganchos](09-tres-visoes-da-arquitetura.md).
+
 
 Para a disposição atual e os ganchos das oito peças, usar o [guia de leitura por camadas](07-guia-de-leitura-por-camadas.md).
 

@@ -17,6 +17,8 @@ Executar a análise, revisar evidências e abrir o rascunho gerado. O Compose de
 
 ## Navegação
 
+**Três mapas para a apresentação:** [01 Camadas](buildarch/04-visao-camadas.buildarch.json) organiza a primeira imagem (slide 19); [02 Escala](buildarch/05-visao-escalabilidade.buildarch.json) detalha a segunda (slide 17); **Arquitetura Santa Cecília** permanece como síntese completa. O [guia das três visões](docs/apresentacao/09-tres-visoes-da-arquitetura.md) traz a sequência, falas e transições. Os três Labs continuam disponíveis separadamente.
+
 | Material | Uso |
 |---|---|
 | [Resumo executivo](docs/apresentacao/01-resumo-executivo.md) | Revisar decisões e alinhar os slides |
@@ -46,7 +48,7 @@ O desenho principal é a referência para explicar todas as camadas. Para a carg
 ## Estrutura
 
 ```text
-buildarch/          arquitetura revisada e três laboratórios
+buildarch/          principal, duas visões complementares e três laboratórios
 docs/apresentacao/  resumo, roteiro, cartão e perguntas
 docs/arquitetura/   decisões, modelo de dados e fluxo transacional
 docs/validacao/     evidências e limites da demonstração

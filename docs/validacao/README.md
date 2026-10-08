@@ -3,7 +3,7 @@
 | Verificação | Resultado | O que comprova |
 |---|---|---|
 | PPT/PDF originais | 25 slides/páginas comparados; cobertura registrada | Correspondência temática e exemplos do material fornecido |
-| Parser oficial do Build Arch | Quatro backups aceitos; 22 revisões do principal | Compatibilidade estrutural dos arquivos |
+| Parser oficial do Build Arch | Seis backups; 22 revisões do principal e duas visões com revisão inicial | Compatibilidade estrutural dos arquivos |
 | Validador do schema | Oito tabelas; sem achados críticos/avisos | Estrutura de tabelas, FKs e índices |
 | Motor temporal | Labs 01/02/03 com mesmos parâmetros | Comparação do modelo, sem benchmark real |
 | Motor ao vivo | Pico 10x e pendências conferidos | Cálculo virtual de processamento/drenagem |
@@ -23,3 +23,5 @@ Capacidade, custo e disponibilidade cadastrados no Build Arch são premissas. Re
 [Diagnóstico da carga](diagnostico-carga.json): projetos salvos no Desktop executados no motor atual, ciclos identificados e resultados dos três Labs. A carga via UI web não foi executada.
 
 [Layout por camadas v22](layout-camadas.json): posições e agrupamentos conferidos, com ramos de leitura/compra separados. O [layout linear v21](layout-linear.json) permanece como histórico. Conteúdo técnico, relações da v19 e versões anteriores foram preservados. Os hashes do PDF/PPT originais foram reconferidos nesta revisão.
+
+[Visões complementares](visoes-complementares.json): visão 01 com 18 blocos/26 relações e visão 02 com 11 blocos/20 relações. Fontes e espaçamento dos blocos conferidos. As visões têm finalidades distintas e não alteram os projetos existentes do Desktop. Consultar o [guia](../apresentacao/09-tres-visoes-da-arquitetura.md) para os limites do motor de carga.
